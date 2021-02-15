@@ -4,7 +4,7 @@
   "description": "Blazing fast dev server powered by smooshpack",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -23,7 +23,8 @@
   },
   "homepage": "https://github.com/ameerthehacker/blazepack#readme",
   "devDependencies": {
-    "rollup": "^2.39.0"
+    "rollup": "^2.39.0",
+    "rollup-plugin-terser": "^7.0.2"
   },
   "dependencies": {
     "minimist": "^1.2.5"
