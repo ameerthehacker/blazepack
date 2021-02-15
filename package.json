@@ -1,0 +1,31 @@
+{
+  "name": "blazepack",
+  "version": "0.0.0-development",
+  "description": "Blazing fast dev server powered by smooshpack",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ameerthehacker/blazepack.git"
+  },
+  "keywords": [
+    "codesandbox",
+    "dev",
+    "server",
+    "smooshpack"
+  ],
+  "author": "Ameer Jhan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ameerthehacker/blazepack/issues"
+  },
+  "homepage": "https://github.com/ameerthehacker/blazepack#readme",
+  "devDependencies": {
+    "rollup": "^2.39.0"
+  },
+  "dependencies": {
+    "minimist": "^1.2.5"
+  }
+}
