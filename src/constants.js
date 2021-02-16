@@ -1,3 +1,7 @@
-const PATCH = 'PATCH';
+const WS_EVENTS = {
+  PATCH: 'PATCH',
+  INIT: 'INIT'
+}
 
-module.exports = { PATCH };
+
+module.exports = { WS_EVENTS };

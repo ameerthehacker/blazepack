@@ -4,7 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const getAllFiles = require('get-all-files').default;
 const WebSocket = require('ws');
-const { INIT } = require('./constants');
+const { WS_EVENTS } = require('./constants');
+const chokidar = require('chokidar');
 
 const EXCLUDED_DIRECTORIES = [
   /node_modules/,
@@ -33,28 +34,31 @@ const sendIndexHTML = (res) => {
   res.end();
 }
 const directory = args._[0] || process.cwd();
-// get all files in the dir except node modules
-const filePaths = getAllFiles.sync.array(directory, {
-  resolve: true,
-  isExcludedDir: (dirname) => EXCLUDED_DIRECTORIES.find(excludedDir => excludedDir.test(dirname))
-});
-let sandboxFiles = {};
+const getSandboxFiles = (directory) => {
+  let sandboxFiles = {};
+  // get all files in the dir except node modules
+  const filePaths = getAllFiles.sync.array(directory, {
+    resolve: true,
+    isExcludedDir: (dirname) => EXCLUDED_DIRECTORIES.find(excludedDir => excludedDir.test(dirname))
+  });
 
-filePaths.forEach(filePath => {
-  // we don't want to read unneccessary huge files
-  const isExcludedFile = EXCLUDED_FILES.find(excludedFile => excludedFile.test(filePath));
 
-  if (isExcludedFile) return;
+  filePaths.forEach(filePath => {
+    // we don't want to read unneccessary huge files
+    const isExcludedFile = EXCLUDED_FILES.find(excludedFile => excludedFile.test(filePath));
 
-  const relativePath = path.relative(directory, filePath);
-  const fileContent = fs.readFileSync(filePath, 'utf-8');
+    if (isExcludedFile) return;
 
-  sandboxFiles[`/${relativePath}`] = {
-    code: fileContent
-  };
+    const relativePath = path.relative(directory, filePath);
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+
+    sandboxFiles[`/${relativePath}`] = {
+      code: fileContent
+    };
+  });
 
   return sandboxFiles;
-});
+}
 
 const httpServer = http.createServer((req, res) => {
   if (req.url === '/') {
@@ -74,9 +78,34 @@ const httpServer = http.createServer((req, res) => {
 const wsServer = new WebSocket.Server({ server: httpServer });
 
 wsServer.on('connection', (ws) => {
-  ws.send(JSON.stringify(sandboxFiles));
+  const sandboxFiles = getSandboxFiles(directory);
+
+  ws.send(JSON.stringify({
+    type: WS_EVENTS.INIT,
+    data: sandboxFiles
+  }));
 });
 
 httpServer.listen(PORT, () => {
-  console.log(`🔥 Blazepack dev server running at http://localhost:${PORT}`);
+  chokidar.watch(directory, { ignoreInitial: true })
+  .on('ready', () => console.log(`🔥 Blazepack dev server running at http://localhost:${PORT}`))
+  .on('all', (event, filePath) => {
+    const relativePath = `/${path.relative(directory, filePath)}`;
+    let fileContent;
+
+    if (event !== 'unlink' && event !== 'unlinkDir') {
+      fileContent = fs.readFileSync(filePath, 'utf-8');
+    }
+
+    wsServer.clients.forEach(client => {
+      client.send(JSON.stringify({
+        type: WS_EVENTS.PATCH,
+        data: {
+          event,
+          path: relativePath,
+          fileContent
+        }
+      }));
+    });
+  });
 });
