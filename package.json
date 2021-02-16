@@ -27,6 +27,7 @@
     "smooshpack": "1.0.0-alpha-26"
   },
   "dependencies": {
+    "get-all-files": "^3.0.0",
     "minimist": "^1.2.5"
   }
 }
