@@ -82,11 +82,11 @@ function startDevServer(directory, port) {
       data: sandboxFiles
     }));
   });
-  
+
   httpServer.listen(port, () => {
     chokidar.watch(directory, { ignoreInitial: true })
     .on('ready', () => {
-      console.log(`🔥 Blazepack dev server running at http://localhost:${port}`);
+      console.log(`⚡ Blazepack dev server running at http://localhost:${port}`);
   
       open(`http://localhost:${port}`);
     })
@@ -109,6 +109,14 @@ function startDevServer(directory, port) {
         }));
       });
     });
+  });
+
+  process.on('uncaughtException', (err) => {
+    if (err.errno === 'EADDRINUSE') {
+      console.log(`😢 Unable to start blazepack dev server, port ${port} is already in use`);
+    } else {
+      console.log(`😢 Unable to start blazepack dev server: ${err.message}`);
+    }
   });
 }
 
