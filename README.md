@@ -11,7 +11,7 @@ I always wanted the super fast feedback that codesandbox provides in my local en
 ## Why Blazepack?
 
 * It is blazing fast ⚡
-* Super tiny (24K) 👌
+* Super tiny (24kb) 👌
 * Run projects without npm install 💃
 * React fast refresh ❤️
 * Supports React, Vue 2, Vue 3, Angular 🔨
