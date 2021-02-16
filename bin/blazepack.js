@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const parseArgs = require('minimist');
 const startDevServer = require('../src');
 
