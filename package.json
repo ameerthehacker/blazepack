@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "get-all-files": "^3.0.0",
-    "minimist": "^1.2.5"
+    "minimist": "^1.2.5",
+    "ws": "^7.4.3"
   }
 }

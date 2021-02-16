@@ -3,6 +3,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const getAllFiles = require('get-all-files').default;
+const WebSocket = require('ws');
+const { INIT } = require('./constants');
 
 const EXCLUDED_DIRECTORIES = [
   /node_modules/,
@@ -54,9 +56,7 @@ filePaths.forEach(filePath => {
   return sandboxFiles;
 });
 
-console.log(sandboxFiles);
-
-http.createServer((req, res) => {
+const httpServer = http.createServer((req, res) => {
   if (req.url === '/') {
     sendIndexHTML(res);
   } else {
@@ -70,6 +70,13 @@ http.createServer((req, res) => {
       sendIndexHTML(res);
     }
   }
-}).listen(PORT, () => {
+});
+const wsServer = new WebSocket.Server({ server: httpServer });
+
+wsServer.on('connection', (ws) => {
+  ws.send(JSON.stringify(sandboxFiles));
+});
+
+httpServer.listen(PORT, () => {
   console.log(`🔥 Blazepack dev server running at http://localhost:${PORT}`);
 });
