@@ -30,13 +30,13 @@ Start using it in your **create react app** or **vue cli app**
 blazepack
 ```
 
-It will start the dev server at port 3000 and open it in browser, you can change the default port by using the **port** option
+It will start the dev server at port **3000** and open it in browser, you can change the default port by using the **port** option
 
 ```
 blazepack --port 3001
 ```
 
-You can also run it using the **npx** and not install it globally
+You can also run it using the **npx** command and not install it globally
 
 ```
 npx blazepack
