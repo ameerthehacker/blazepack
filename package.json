@@ -2,7 +2,10 @@
   "name": "blazepack",
   "version": "0.0.0-development",
   "description": "Blazing fast dev server powered by smooshpack",
-  "main": "src/index.js",
+  "main": "./bin/blazepack.js",
+  "bin": {
+    "kubelive": "./bin/kubelive.js"
+  },
   "scripts": {
     "build-client": "parcel build src/client/index.js --out-dir src/static"
   },
