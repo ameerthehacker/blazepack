@@ -27,7 +27,8 @@
   },
   "homepage": "https://github.com/ameerthehacker/blazepack#readme",
   "devDependencies": {
-    "smooshpack": "1.0.0-alpha-26"
+    "smooshpack": "1.0.0-alpha-26",
+    "parcel-bundler": "^1.12.4"
   },
   "dependencies": {
     "chokidar": "^3.5.1",
