@@ -4,7 +4,7 @@
   "description": "Blazing fast dev server powered by smooshpack",
   "main": "src/index.js",
   "scripts": {
-    "build": "parcel build src/client/index.js --out-dir src/static"
+    "build-client": "parcel build src/client/index.js --out-dir src/static"
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
     "chokidar": "^3.5.1",
     "get-all-files": "^3.0.0",
     "minimist": "^1.2.5",
+    "open": "^7.4.1",
     "ws": "^7.4.3"
   }
 }

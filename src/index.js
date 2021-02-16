@@ -6,6 +6,7 @@ const getAllFiles = require('get-all-files').default;
 const WebSocket = require('ws');
 const { WS_EVENTS } = require('./constants');
 const chokidar = require('chokidar');
+const open = require('open');
 
 const EXCLUDED_DIRECTORIES = [
   /node_modules/,
@@ -88,7 +89,11 @@ wsServer.on('connection', (ws) => {
 
 httpServer.listen(PORT, () => {
   chokidar.watch(directory, { ignoreInitial: true })
-  .on('ready', () => console.log(`🔥 Blazepack dev server running at http://localhost:${PORT}`))
+  .on('ready', () => {
+    console.log(`🔥 Blazepack dev server running at http://localhost:${PORT}`);
+
+    open(`http://localhost:${PORT}`);
+  })
   .on('all', (event, filePath) => {
     const relativePath = `/${path.relative(directory, filePath)}`;
     let fileContent;
