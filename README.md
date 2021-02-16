@@ -44,9 +44,6 @@ npx blazepack
 
 Show your support by ⭐ the repo
 
-```
-npx blazepack
-```
 ## License
 
 GPL © [Ameer Jhan](mailto:ameerjhanprof@gmail.com)
