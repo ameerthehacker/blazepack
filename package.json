@@ -1,6 +1,6 @@
 {
   "name": "blazepack",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Blazing fast dev server powered by smooshpack",
   "main": "./bin/blazepack.js",
   "bin": {
@@ -27,7 +27,6 @@
   },
   "homepage": "https://github.com/ameerthehacker/blazepack#readme",
   "devDependencies": {
-    "parcel-bundler": "^1.12.4",
     "smooshpack": "1.0.0-alpha-26"
   },
   "dependencies": {
