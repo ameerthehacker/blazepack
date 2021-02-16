@@ -17,7 +17,8 @@ ws.onmessage = (evt) => {
       sandboxFiles = data;
 
       sandpackManager.updatePreview({
-        files: data
+        files: data,
+        showOpenInCodeSandbox: false
       });
 
       break;
@@ -25,7 +26,7 @@ ws.onmessage = (evt) => {
     case WS_EVENTS.PATCH: {
       const { event, fileContent, path } = data;
 
-      // do a full page reload on new file or folder creation
+      // do a full page reload on new file or folder creation or deletion
       if (event === 'add' || event === 'unlink') {
         window.location.reload();
       }
