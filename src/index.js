@@ -6,6 +6,7 @@ const WebSocket = require('ws');
 const { WS_EVENTS } = require('./constants');
 const chokidar = require('chokidar');
 const open = require('open');
+const { isImage, toDataUrl } = require('./utils');
 
 function startDevServer(directory, port) {
   const EXCLUDED_DIRECTORIES = [
@@ -43,11 +44,18 @@ function startDevServer(directory, port) {
     filePaths.forEach(filePath => {
       // we don't want to read unneccessary huge files
       const isExcludedFile = EXCLUDED_FILES.find(excludedFile => excludedFile.test(filePath));
+      const filename = path.basename(filePath);
   
       if (isExcludedFile) return;
   
       const relativePath = path.relative(directory, filePath);
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
+      let fileContent;
+
+      if (isImage(filename)) {
+        fileContent = toDataUrl(filePath);
+      } else {
+        fileContent = fs.readFileSync(filePath, 'utf-8');
+      }
   
       sandboxFiles[`/${relativePath}`] = {
         code: fileContent
@@ -111,13 +119,15 @@ function startDevServer(directory, port) {
     });
   });
 
-  process.on('uncaughtException', (err) => {
-    if (err.errno === 'EADDRINUSE') {
-      console.log(`😢 Unable to start blazepack dev server, port ${port} is already in use`);
-    } else {
-      console.log(`😢 Unable to start blazepack dev server: ${err.message}`);
-    }
-  });
+  if (process.env.NODE_ENV !== 'development') {
+    process.on('uncaughtException', (err) => {
+      if (err.errno === 'EADDRINUSE') {
+        console.log(`😢 Unable to start blazepack dev server, port ${port} is already in use`);
+      } else {
+        console.log(`😢 Unable to start blazepack dev server: ${err.message}`);
+      }
+    });
+  }
 }
 
 module.exports = startDevServer;
