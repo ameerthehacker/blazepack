@@ -14,7 +14,7 @@ function getRelativeUrl(url) {
 
 window.onpopstate = () => {
   // back btn
-  if (historyStateUID > history.state.uid) {
+  if (!history.state || (historyStateUID > history.state.uid)) {
     sandpackManager.dispatch({ type: 'urlback' });
   } else {
     sandpackManager.dispatch({ type: 'urlforward' });
