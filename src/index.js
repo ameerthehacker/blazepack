@@ -6,10 +6,34 @@ const WebSocket = require('ws');
 const { WS_EVENTS } = require('./constants');
 const chokidar = require('chokidar');
 const open = require('open');
-const { isImage, toDataUrl, logError, logSuccess, logInfo } = require('./utils');
+const { isImage, toDataUrl, logError, logSuccess, logInfo, getTemplateURL, downloadFileToTemp } = require('./utils');
 const findPackageJSON = require('find-package-json');
 const detectIndent = require('detect-indent');
 const getLatestVersion = require('latest-version');
+const extractZip = require('extract-zip');
+
+async function createProject(projectName, template, startServer, port) {
+ try {
+  const projectPath = path.join(process.cwd(), projectName);
+
+  if (fs.existsSync(projectPath)) {
+    logError(`Sorry a directory with name ${projectName} already exists!`);
+    
+    process.exit(1);
+  }
+
+  const templateURL = await getTemplateURL(template);
+  const fileName = await downloadFileToTemp(templateURL);
+
+  await extractZip(fileName, {
+    dir: projectPath
+  });
+
+  if(startServer) startDevServer(projectPath, port);
+ } catch(err) {
+   console.log(`Unable to create new project: ${err}`);
+ }
+}
 
 async function installPackage(package) {
   try {
@@ -194,4 +218,4 @@ function startDevServer(directory, port) {
 
 
 
-module.exports = { startDevServer, installPackage };
+module.exports = { startDevServer, installPackage, createProject };

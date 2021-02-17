@@ -118,3 +118,4 @@ dist
 # source maps
 *.js.map
 src/static/index.js
+playground/

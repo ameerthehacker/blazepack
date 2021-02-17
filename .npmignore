@@ -2,4 +2,6 @@ examples/
 src/client/
 # source maps
 *.js.map
+# unwanted files
 .cache/
+playground/
