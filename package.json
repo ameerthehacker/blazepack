@@ -7,7 +7,8 @@
     "blazepack": "./bin/blazepack.js"
   },
   "scripts": {
-    "build-client": "parcel build src/client/index.js --out-dir src/static"
+    "build-client": "parcel build src/client/index.js --out-dir src/static",
+    "dev-client": "parcel src/client/index.js --out-dir src/static"
   },
   "repository": {
     "type": "git",
