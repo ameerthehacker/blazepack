@@ -42,6 +42,12 @@ You can also run it using the **npx** command and not install it globally
 npx blazepack
 ```
 
+To know the version of blazepack you are running use the **--version** option
+
+```
+blazepack --version
+```
+
 Show your support by ⭐ the repo
 
 ## License
