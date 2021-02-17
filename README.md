@@ -42,6 +42,13 @@ You can also run it using the **npx** command and not install it globally
 npx blazepack
 ```
 
+You can install a new package pretty fast using the below command. It does not create **node_modules** so you are gonna save a lot of space 😉
+
+```
+blazepack install redux
+```
+
+
 To know the version of blazepack you are running use the **--version** option
 
 ```
