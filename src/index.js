@@ -6,7 +6,7 @@ const WebSocket = require('ws');
 const { WS_EVENTS } = require('./constants');
 const chokidar = require('chokidar');
 const open = require('open');
-const { isImage, toDataUrl } = require('./utils');
+const { isImage, toDataUrl, logError } = require('./utils');
 
 function startDevServer(directory, port) {
   const EXCLUDED_DIRECTORIES = [
@@ -89,6 +89,20 @@ function startDevServer(directory, port) {
       type: WS_EVENTS.INIT,
       data: sandboxFiles
     }));
+
+    ws.on('message', (evt) => {
+      const { type, data } = JSON.parse(evt);
+      const { title, message } = data;
+
+      switch(type) {
+        case WS_EVENTS.ERROR: {
+          logError(title);
+          logError(message);
+          
+          break;
+        }
+      }
+    });
   });
 
   httpServer.listen(port, () => {
@@ -122,9 +136,9 @@ function startDevServer(directory, port) {
   if (process.env.NODE_ENV !== 'development') {
     process.on('uncaughtException', (err) => {
       if (err.errno === 'EADDRINUSE') {
-        console.log(`😢 Unable to start blazepack dev server, port ${port} is already in use`);
+        logError(`😢 Unable to start blazepack dev server, port ${port} is already in use`);
       } else {
-        console.log(`😢 Unable to start blazepack dev server: ${err.message}`);
+        logError(`😢 Unable to start blazepack dev server: ${err.message}`);
       }
     });
   }

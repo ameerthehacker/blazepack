@@ -1,7 +1,7 @@
 const WS_EVENTS = {
   PATCH: 'PATCH',
-  INIT: 'INIT'
+  INIT: 'INIT',
+  ERROR: 'ERROR',
 }
-
 
 module.exports = { WS_EVENTS };

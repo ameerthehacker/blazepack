@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { red, blue } = require('chalk');
 
 function getExtension(filename) {
   const [, ext] = filename.split('.');
@@ -22,4 +23,12 @@ function readAsDataUrlSync(filePath) {
   return `data:image/${ext};base64,${fileContent}`;
 }
 
-module.exports = { isImage, toDataUrl: readAsDataUrlSync, getExtension };
+function logError(message) {
+  console.log(red(message));
+}
+
+function logInfo(message) {
+  console.log(blue(message));
+}
+
+module.exports = { isImage, toDataUrl: readAsDataUrlSync, getExtension, logError, logInfo };

@@ -28,6 +28,15 @@ sandpackManager.listen((evt) => {
 
       history.pushState({ uid: historyStateUID }, '', relativeUrl);
       historyStateUID++;
+
+      break;
+    }
+    case "action": {
+      if (evt.action === "show-error") {
+        ws.send(JSON.stringify({ type: WS_EVENTS.ERROR, data: { title: evt.title, message: evt.message } }));
+      }
+
+      break;
     }
   }
 });
