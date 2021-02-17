@@ -12,6 +12,13 @@ function getRelativeUrl(url) {
   return url.replace(sandpackManager.bundlerURL, "");
 }
 
+function getFilename(filePath) {
+  const fileParts = filePath.split('/');
+  const filename = fileParts[fileParts.length - 1];
+
+  return filename;
+}
+
 window.onpopstate = () => {
   // back btn
   if (!history.state || (historyStateUID > history.state.uid)) {
@@ -60,6 +67,12 @@ ws.onmessage = (evt) => {
     }
     case WS_EVENTS.PATCH: {
       const { event, fileContent, path } = data;
+      const filename = getFilename(path);
+
+      // we need to reload so that sandpack can install the package
+      if (filename === 'package.json') {
+        window.location.reload();
+      }
 
       // do a full page reload on new file or folder creation or deletion
       if (event === 'add' || event === 'unlink') {
