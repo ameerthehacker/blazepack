@@ -22,6 +22,8 @@ async function createProject(projectName, template, startServer, port) {
     process.exit(1);
   }
 
+  logInfo(`Downloading the template ${template}...`)
+
   const templateURL = await getTemplateURL(template);
   const fileName = await downloadFileToTemp(templateURL);
 

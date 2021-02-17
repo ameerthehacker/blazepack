@@ -24,7 +24,19 @@ Install it globally
 npm i -g blazepack
 ```
 
-Start using it in your **create react app** or **vue cli app** 
+Create your first **create react app**
+
+```
+blazepack create my-cra --template=react
+```
+
+The available template options are **react, angular, vue2, vue3, preact and svelte**. You can use the below command to create the app and also start the dev server immediately
+
+```
+blazepack start my-cra --template=angular
+```
+
+To use it in your existing **create react app**, **angular**, **preact**, **svelte**, **vue cli app** just run
 
 ```
 blazepack
