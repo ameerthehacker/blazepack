@@ -6,7 +6,44 @@ const WebSocket = require('ws');
 const { WS_EVENTS } = require('./constants');
 const chokidar = require('chokidar');
 const open = require('open');
-const { isImage, toDataUrl, logError } = require('./utils');
+const { isImage, toDataUrl, logError, logSuccess } = require('./utils');
+const findPackageJSON = require('find-package-json');
+const detectIndent = require('detect-indent');
+const getLatestVersion = require('latest-version');
+
+async function installPackage(package) {
+  try {
+    const [packageName, version] = package.split('@');
+    const iterator = findPackageJSON();
+    const nextPackageJSON = iterator.next();
+
+    if (nextPackageJSON) {
+      const packageJSONContent = fs.readFileSync(nextPackageJSON.filename, 'utf-8');
+      const packageJSON = JSON.parse(packageJSONContent);
+      const latestVersion = await getLatestVersion(packageName);
+      const packageVersion = version || latestVersion;
+  
+      if (packageJSON.dependencies) {
+        packageJSON.dependencies = {
+          ...packageJSON.dependencies,
+          [packageName]: `^${packageVersion}`
+        }
+      }
+  
+      fs.writeFileSync(nextPackageJSON.filename, JSON.stringify(packageJSON, null, detectIndent(packageJSONContent).indent || 2));
+
+      logSuccess(`Installed package ${packageName}@${packageVersion}`);
+    } else {
+      logError('Unable to find package.json for the project');
+    }
+  } catch(err) {
+    if (err.name === 'PackageNotFoundError')  {
+      logError(`Unable to find package ${package} in the npm registry`);
+    } else {
+      logError(`Unable to install package ${package}: ${err}`);
+    }
+  }
+}
 
 function startDevServer(directory, port) {
   const EXCLUDED_DIRECTORIES = [
@@ -144,4 +181,4 @@ function startDevServer(directory, port) {
   }
 }
 
-module.exports = startDevServer;
+module.exports = { startDevServer, installPackage };
