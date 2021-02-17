@@ -92,8 +92,11 @@ ws.onmessage = (evt) => {
   } catch(e) {
      ws.send(
        JSON.stringify({
-         type: WS_EVENTS.COMPILE_ERROR,
-         data: { title: "Unhandled Sandpack error while running the app.", message: e.message },
+         type: WS_EVENTS.UNHANDLED_SANDPACK_ERROR,
+         data: {
+           title: "Unhandled Sandpack error while running the app.",
+           message: e.message,
+         },
        })
      );
   }

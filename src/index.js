@@ -10,7 +10,6 @@ const { isImage, toDataUrl, logError, logSuccess, logInfo } = require('./utils')
 const findPackageJSON = require('find-package-json');
 const detectIndent = require('detect-indent');
 const getLatestVersion = require('latest-version');
-const createHttpTerminator =  require("http-terminator").createHttpTerminator;
 
 async function installPackage(package) {
   try {
@@ -120,10 +119,6 @@ function startDevServer(directory, port) {
     }
   });
 
-  const httpTerminator = createHttpTerminator({
-    server: httpServer,
-  });
-
   const wsServer = new WebSocket.Server({ server: httpServer });
   
   wsServer.on('connection', (ws) => {
@@ -145,15 +140,13 @@ function startDevServer(directory, port) {
           
           break;
         }
-        case WS_EVENTS.COMPILE_ERROR: {
+        case WS_EVENTS.UNHANDLED_SANDPACK_ERROR: {
           logError(title);
           logError(message);
 
           logInfo("Terminating the server");
-          httpTerminator.terminate();
-
+          httpServer.close();
           process.exit(1);
-          break;
         }
       }
     });
