@@ -2,6 +2,7 @@ const WS_EVENTS = {
   PATCH: 'PATCH',
   INIT: 'INIT',
   ERROR: 'ERROR',
+  UNHANDLED_SANDPACK_ERROR: 'UNHANDLED_SANDPACK_ERROR'
 }
 
 module.exports = { WS_EVENTS };

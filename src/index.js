@@ -6,7 +6,7 @@ const WebSocket = require('ws');
 const { WS_EVENTS } = require('./constants');
 const chokidar = require('chokidar');
 const open = require('open');
-const { isImage, toDataUrl, logError, logSuccess } = require('./utils');
+const { isImage, toDataUrl, logError, logSuccess, logInfo } = require('./utils');
 const findPackageJSON = require('find-package-json');
 const detectIndent = require('detect-indent');
 const getLatestVersion = require('latest-version');
@@ -118,6 +118,7 @@ function startDevServer(directory, port) {
       }
     }
   });
+
   const wsServer = new WebSocket.Server({ server: httpServer });
   
   wsServer.on('connection', (ws) => {
@@ -139,9 +140,18 @@ function startDevServer(directory, port) {
           
           break;
         }
+        case WS_EVENTS.UNHANDLED_SANDPACK_ERROR: {
+          logError(title);
+          logError(message);
+
+          logInfo("Terminating the server");
+          httpServer.close();
+          process.exit(1);
+        }
       }
     });
   });
+
 
   httpServer.listen(port, () => {
     chokidar.watch(directory, { ignoreInitial: true })
@@ -181,5 +191,7 @@ function startDevServer(directory, port) {
     });
   }
 }
+
+
 
 module.exports = { startDevServer, installPackage };
