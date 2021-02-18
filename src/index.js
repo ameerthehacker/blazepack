@@ -56,7 +56,7 @@ async function installPackage(package) {
         }
       }
   
-      // detectIntent helps us in not fucking up the indentation in the package json file
+      // detectIntent keeps up the indentation of the original file preserved 
       fs.writeFileSync(nextPackageJSON.filename, JSON.stringify(packageJSON, null, detectIndent(packageJSONContent).indent || 2));
 
       logSuccess(`Installed package ${packageName}@${packageVersion}`);
