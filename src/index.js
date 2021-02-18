@@ -6,7 +6,7 @@ const WebSocket = require('ws');
 const { WS_EVENTS } = require('./constants');
 const chokidar = require('chokidar');
 const open = require('open');
-const { isImage, toDataUrl, logError, logSuccess, logInfo, getTemplateURL, downloadFileToTemp } = require('./utils');
+const { isImage, toDataUrl, logError, logSuccess, logInfo, getTemplateURL, downloadFileToTemp, getPosixPath } = require('./utils');
 const findPackageJSON = require('find-package-json');
 const detectIndent = require('detect-indent');
 const getLatestVersion = require('latest-version');
@@ -112,7 +112,7 @@ function startDevServer(directory, port) {
   
       if (isExcludedFile) return;
   
-      const relativePath = path.relative(directory, filePath);
+      const relativePath = getPosixPath(path.relative(directory, filePath));
       let fileContent;
 
       if (isImage(filename)) {
@@ -187,7 +187,7 @@ function startDevServer(directory, port) {
       open(`http://localhost:${port}`);
     })
     .on('all', (event, filePath) => {
-      const relativePath = `/${path.relative(directory, filePath)}`;
+      const relativePath = `/${getPosixPath(path.relative(directory, filePath))}`;
       let fileContent;
   
       if (event !== 'unlink' && event !== 'unlinkDir') {

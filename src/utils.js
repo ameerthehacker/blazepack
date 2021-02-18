@@ -19,6 +19,10 @@ function isImage(filename) {
   return imageExtensions.includes(ext)
 }
 
+function getPosixPath(filePath) {
+  return filePath.split(path.sep).join(path.posix.sep);
+}
+
 function readAsDataUrlSync(filePath) {
   const filename = path.basename(filePath);
   const ext = getExtension(filename);
@@ -77,5 +81,6 @@ module.exports = {
   logSuccess,
   getTemplateURL,
   generateRandomHash,
-  downloadFileToTemp
+  downloadFileToTemp,
+  getPosixPath
 };
