@@ -33,7 +33,7 @@ blazepack create my-cra --template=react
 The available template options are **react, angular, vue2, vue3, preact and svelte**. You can use the below command to create the app and also start the dev server immediately
 
 ```
-blazepack start my-cra --template=angular
+blazepack start my-angular-app --template=angular
 ```
 
 To use it in your existing **create react app**, **angular**, **preact**, **svelte**, **vue cli app** just run

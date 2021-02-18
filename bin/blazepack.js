@@ -55,7 +55,7 @@ if (args.version) {
 
       template = validateNewProject(projectName, template);
 
-      createProject(projectName, template, false, PORT);
+      createProject({ projectName, template, startServer: false, port: PORT });
 
       break;
     }
@@ -65,7 +65,7 @@ if (args.version) {
 
       template = validateNewProject(projectName, template);
 
-      createProject(projectName, template, true, PORT);
+      createProject({ projectName, template, startServer: true, port: PORT });
 
       break;
     }

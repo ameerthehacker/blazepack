@@ -12,7 +12,7 @@ const detectIndent = require('detect-indent');
 const getLatestVersion = require('latest-version');
 const extractZip = require('extract-zip');
 
-async function createProject(projectName, template, startServer, port) {
+async function createProject({ projectName, template, startServer, port }) {
  try {
   const projectPath = path.join(process.cwd(), projectName);
 
@@ -56,7 +56,7 @@ async function installPackage(package) {
         }
       }
   
-      // detectIntent helps us in not fucking up the indentation in the package json file
+      // detectIntent keeps up the indentation of the original file preserved 
       fs.writeFileSync(nextPackageJSON.filename, JSON.stringify(packageJSON, null, detectIndent(packageJSONContent).indent || 2));
 
       logSuccess(`Installed package ${packageName}@${packageVersion}`);
