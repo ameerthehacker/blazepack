@@ -12,7 +12,7 @@ const detectIndent = require('detect-indent');
 const getLatestVersion = require('latest-version');
 const extractZip = require('extract-zip');
 
-async function createProject(projectName, template, startServer, port) {
+async function createProject({ projectName, template, startServer, port }) {
  try {
   const projectPath = path.join(process.cwd(), projectName);
 
