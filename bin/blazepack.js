@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const parseArgs = require('minimist');
-const { startDevServer, installPackage, createProject } = require('../src');
+const { startDevServer, installPackage, createProject,cloneSandbox } = require('../src');
 const { version } = require('../package.json');
 const { logError, logInfo } = require('../src/utils');
 
@@ -37,7 +37,7 @@ if (args.version) {
   console.log(`v${version}`);
 } else {
   switch (commandOrDirectory) {
-    case 'install': {
+    case "install": {
       const package = args._[1];
 
       if (!package) {
@@ -49,7 +49,7 @@ if (args.version) {
       installPackage(package);
       break;
     }
-    case 'create': {
+    case "create": {
       const projectName = args._[1];
       let template = args.template;
 
@@ -59,13 +59,26 @@ if (args.version) {
 
       break;
     }
-    case 'start': {
+    case "start": {
       const projectName = args._[1];
       let template = args.template;
 
       template = validateNewProject(projectName, template);
 
       createProject({ projectName, template, startServer: true, port: PORT });
+
+      break;
+    }
+    case "clone": {
+      const sandboxId = args._[1];
+
+      if (!sandboxId) {
+        logError(`Required argument sandbox id was not provied`);
+
+        process.exit(1);
+      }
+
+      cloneSandbox({id: sandboxId});
 
       break;
     }
