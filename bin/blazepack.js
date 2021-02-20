@@ -70,16 +70,36 @@ if (args.version) {
       break;
     }
     case "clone": {
-      const sandboxId = args._[1];
+      const potentialSandboxIdentifier = args._[1];
 
-      if (!sandboxId) {
-        logError(`Required argument sandbox id was not provied`);
-
+      if (!potentialSandboxIdentifier) {
+        logError(`Required argument; sandbox id or url was not provided`);
         process.exit(1);
       }
 
-      cloneSandbox({id: sandboxId});
+      let sandboxId = potentialSandboxIdentifier;
 
+      try {
+        /**
+         * Sample URLs for Sandbox:
+         * https://codesandbox.io/s/unique_id or https://codesandbox.io/embed/unique_id
+         */
+        const url = new URL(potentialSandboxIdentifier);
+        const potentialSandboxId = url.pathname.split('/')[2];
+        if (potentialSandboxId) {
+          sandboxId = potentialSandboxId;
+        } else {
+          logError("Please make sure the URL is correct");
+          process.exit(1);
+        }
+      } catch(e) {
+        /**
+         * Argument passed is not URL so we suppose it to be id.
+         * If it is invalid Sandbox API will throw error
+         */
+      }
+
+      cloneSandbox({ id: sandboxId });
       break;
     }
     default: {

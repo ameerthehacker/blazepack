@@ -6,7 +6,18 @@ const WebSocket = require('ws');
 const { WS_EVENTS } = require('./constants');
 const chokidar = require('chokidar');
 const open = require('open');
-const { isImage, toDataUrl, logError, logSuccess, logInfo, getTemplateURL, downloadFileToTemp, getPosixPath, downloadSandboxFiles, createSandboxClone } = require('./utils');
+const {
+  isImage,
+  toDataUrl,
+  logError,
+  logSuccess,
+  logInfo,
+  getTemplateURL,
+  downloadFileToTemp,
+  getPosixPath,
+  getSandboxFiles,
+  createSandboxFiles,
+} = require("./utils");
 const findPackageJSON = require('find-package-json');
 const detectIndent = require('detect-indent');
 const getLatestVersion = require('latest-version');
@@ -39,12 +50,13 @@ async function createProject({ projectName, template, startServer, port }) {
 
 async function cloneSandbox({id}) {
   try {
-    const res = await downloadSandboxFiles(id);
-
-
-    await createSandboxClone(res.data);
-  }catch(e) {
-    console.log(e)
+    logInfo("📥 Fetching sandbox info...");  
+    const res = await getSandboxFiles(id);
+    logInfo("📁 Creating files & directories"); 
+    await createSandboxFiles(res.data);
+    logInfo("✅ Sandbox cloned");  
+  } catch(e) {
+    logError(`😢 Unable to clone sandbox: ${e}`);
   }
 }
 
