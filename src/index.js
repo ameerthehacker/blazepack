@@ -245,8 +245,6 @@ function startDevServer(directory, port) {
   }
 }
 
-
-
 module.exports = {
   startDevServer,
   installPackage,
