@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const parseArgs = require('minimist');
-const { startDevServer, installPackage, createProject } = require('../src');
+const { startDevServer, installPackage, createProject,cloneSandbox } = require('../src');
 const { version } = require('../package.json');
 const { logError, logInfo } = require('../src/utils');
 
@@ -37,7 +37,7 @@ if (args.version) {
   console.log(`v${version}`);
 } else {
   switch (commandOrDirectory) {
-    case 'install': {
+    case "install": {
       const package = args._[1];
 
       if (!package) {
@@ -49,7 +49,7 @@ if (args.version) {
       installPackage(package);
       break;
     }
-    case 'create': {
+    case "create": {
       const projectName = args._[1];
       let template = args.template;
 
@@ -59,7 +59,7 @@ if (args.version) {
 
       break;
     }
-    case 'start': {
+    case "start": {
       const projectName = args._[1];
       let template = args.template;
 
@@ -67,6 +67,39 @@ if (args.version) {
 
       createProject({ projectName, template, startServer: true, port: PORT });
 
+      break;
+    }
+    case "clone": {
+      const potentialSandboxIdentifier = args._[1];
+
+      if (!potentialSandboxIdentifier) {
+        logError(`Required argument; sandbox id or url was not provided`);
+        process.exit(1);
+      }
+
+      let sandboxId = potentialSandboxIdentifier;
+
+      try {
+        /**
+         * Sample URLs for Sandbox:
+         * https://codesandbox.io/s/unique_id or https://codesandbox.io/embed/unique_id
+         */
+        const url = new URL(potentialSandboxIdentifier);
+        const potentialSandboxId = url.pathname.split('/')[2];
+        if (potentialSandboxId) {
+          sandboxId = potentialSandboxId;
+        } else {
+          logError("Please make sure the URL is correct");
+          process.exit(1);
+        }
+      } catch(e) {
+        /**
+         * Argument passed is not URL so we suppose it to be id.
+         * If it is invalid Sandbox API will throw error
+         */
+      }
+
+      cloneSandbox({ id: sandboxId });
       break;
     }
     default: {
