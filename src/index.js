@@ -83,10 +83,10 @@ function startDevServer(directory, port) {
     /package-lock.json/,
     /.gitignore/
   ]
-  const STATIC_PATH = path.join(__dirname, 'static');
-  const INDEX_HTML_PATH = path.join(STATIC_PATH, 'index.html');
+  const WWW_PATH = path.join(__dirname, 'client', 'www');
+  const INDEX_HTML_PATH = path.join(WWW_PATH, 'index.html');
   const assetExistsInStaticPath = (url) => {
-    const assetPath = path.join(STATIC_PATH, url);
+    const assetPath = path.join(WWW_PATH, url);
   
     return fs.existsSync(assetPath);
   }
@@ -120,9 +120,12 @@ function startDevServer(directory, port) {
       } else {
         fileContent = fs.readFileSync(filePath, 'utf-8');
       }
+
+      const sandboxFilePath = `/${relativePath}`;
   
-      sandboxFiles[`/${relativePath}`] = {
-        code: fileContent
+      sandboxFiles[sandboxFilePath] = {
+        code: fileContent,
+        path: sandboxFilePath
       };
     });
   
@@ -134,8 +137,9 @@ function startDevServer(directory, port) {
       sendIndexHTML(res);
     } else {
       if (assetExistsInStaticPath(req.url)) {
-        const assetPath = path.join(STATIC_PATH, req.url);
+        const assetPath = path.join(WWW_PATH, req.url);
         const assetContent = fs.readFileSync(assetPath, 'utf-8');
+        res.setHeader('Content-Type', 'text/javascript');
   
         res.write(assetContent);
         res.end();

@@ -119,3 +119,4 @@ dist
 *.js.map
 src/static/index.js
 playground/
+src/client/www

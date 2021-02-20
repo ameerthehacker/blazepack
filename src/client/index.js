@@ -1,16 +1,13 @@
-import { Manager } from './sandpack';
-import { name } from '../../package.json';
 import { WS_EVENTS } from '../constants';
+import { name } from '../../package.json';
 
-let sandpackManager = new Manager('#root', { showOpenInCodeSandbox: false });
+const compile = window.compile;
+const getSandboxTemplate = window.getTemplate;
 const info = (message) => console.log(`${name}: ${message}`)
 const ws = new WebSocket(`ws://${window.location.host}`);
 let sandboxFiles;
-let historyStateUID = 0;
 
-function getRelativeUrl(url) {
-  return url.replace(sandpackManager.bundlerURL, "");
-}
+ws.onopen = () => info('connected');
 
 function getFilename(filePath) {
   const fileParts = filePath.split('/');
@@ -19,37 +16,12 @@ function getFilename(filePath) {
   return filename;
 }
 
-window.onpopstate = () => {
-  // back btn
-  if (!history.state || (historyStateUID > history.state.uid)) {
-    sandpackManager.dispatch({ type: 'urlback' });
-  } else {
-    sandpackManager.dispatch({ type: 'urlforward' });
-  }
+function getSandboxTemplateName(sandboxFiles) {
+  const packageJSON = JSON.parse(sandboxFiles['/package.json'].code);
+  const sandboxTemplate = getSandboxTemplate(packageJSON, sandboxFiles);
+
+  return sandboxTemplate;
 }
-
-sandpackManager.listen((evt) => {
-  switch (evt.type) {
-    case "urlchange": {
-      const relativeUrl = getRelativeUrl(evt.url);
-
-      history.pushState({ uid: historyStateUID }, '', relativeUrl);
-      historyStateUID++;
-
-      break;
-    }
-    case "action": {
-      if (evt.action === "show-error") {
-        ws.send(JSON.stringify({ type: WS_EVENTS.ERROR, data: { title: evt.title, message: evt.message } }));
-      }
-
-      break;
-    }
-  }
-});
-
-
-ws.onopen = () => info('connected');
 
 ws.onmessage = (evt) => {
   const { type, data } = JSON.parse(evt.data);
@@ -59,9 +31,12 @@ ws.onmessage = (evt) => {
       case WS_EVENTS.INIT: {
         sandboxFiles = data;
 
-        sandpackManager.updatePreview({
-          files: data,
-          showOpenInCodeSandbox: false,
+        compile({
+          modules: sandboxFiles,
+          codesandbox: true,
+          externalResources: [],
+          template: getSandboxTemplateName(sandboxFiles),
+          isInitializationCompile: true 
         });
 
         break;
@@ -80,12 +55,15 @@ ws.onmessage = (evt) => {
           window.location.reload();
         }
 
-        const updatedFiles = { ...sandboxFiles, [path]: { code: fileContent } };
+        const updatedFiles = { ...sandboxFiles, [path]: { code: fileContent, path } };
 
-        sandpackManager.updatePreview({
-          files: updatedFiles,
-          showOpenInCodeSandbox: false,
+        compile({
+          modules: updatedFiles,
+          codesandbox: true,
+          externalResources: [],
+          template: getSandboxTemplateName(updatedFiles)
         });
+        
         break;
       }
     }
