@@ -3,9 +3,11 @@ import { name } from '../../package.json';
 
 const compile = window.compile;
 const getSandboxTemplate = window.getTemplate;
+const getTemplateDefinition = window.getTemplateDefinition;
 const info = (message) => console.log(`${name}: ${message}`)
 const ws = new WebSocket(`ws://${window.location.host}`);
 let sandboxFiles;
+let manager;
 
 ws.onopen = () => info('connected');
 
@@ -14,6 +16,22 @@ function getFilename(filePath) {
   const filename = fileParts[fileParts.length - 1];
 
   return filename;
+}
+
+export function getHTMLParts(html) {
+  if (html.includes('<body>')) {
+    const bodyMatcher = /<body.*>([\s\S]*)<\/body>/m;
+    const headMatcher = /<head>([\s\S]*)<\/head>/m;
+
+    const headMatch = html.match(headMatcher);
+    const bodyMatch = html.match(bodyMatcher);
+    const head = headMatch && headMatch[1] ? headMatch[1] : '';
+    const body = bodyMatch && bodyMatch[1] ? bodyMatch[1] : html;
+
+    return { body, head };
+  }
+
+  return { head: '', body: html };
 }
 
 function getSandboxTemplateName(sandboxFiles) {
@@ -30,6 +48,16 @@ ws.onmessage = (evt) => {
     switch (type) {
       case WS_EVENTS.INIT: {
         sandboxFiles = data;
+        const sandboxTemplate = getSandboxTemplateName(sandboxFiles);
+        const sandboxTemplateDefinition = getTemplateDefinition(sandboxTemplate);
+        const htmlEntryFile = sandboxTemplateDefinition.getHTMLEntries()[0];
+
+        if (htmlEntryFile) {
+          const htmlContent = sandboxFiles[htmlEntryFile].code;
+          const { head } = getHTMLParts(htmlContent);
+
+          document.head.innerHTML = head;
+        }
 
         compile({
           modules: sandboxFiles,
