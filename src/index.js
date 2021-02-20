@@ -6,7 +6,18 @@ const WebSocket = require('ws');
 const { WS_EVENTS } = require('./constants');
 const chokidar = require('chokidar');
 const open = require('open');
-const { isImage, toDataUrl, logError, logSuccess, logInfo, getTemplateURL, downloadFileToTemp, getPosixPath } = require('./utils');
+const {
+  isImage,
+  toDataUrl,
+  logError,
+  logSuccess,
+  logInfo,
+  getTemplateURL,
+  downloadFileToTemp,
+  getPosixPath,
+  getSandboxFiles,
+  createSandboxFiles,
+} = require("./utils");
 const findPackageJSON = require('find-package-json');
 const detectIndent = require('detect-indent');
 const getLatestVersion = require('latest-version');
@@ -35,6 +46,18 @@ async function createProject({ projectName, template, startServer, port }) {
  } catch(err) {
    console.log(`Unable to create new project: ${err}`);
  }
+}
+
+async function cloneSandbox({id}) {
+  try {
+    logInfo("📥 Fetching sandbox info...");  
+    const res = await getSandboxFiles(id);
+    logInfo("📁 Creating files & directories"); 
+    await createSandboxFiles(res.data);
+    logInfo("✅ Sandbox cloned");  
+  } catch(e) {
+    logError(`😢 Unable to clone sandbox: ${e}`);
+  }
 }
 
 async function installPackage(package) {
@@ -220,4 +243,9 @@ function startDevServer(directory, port) {
 
 
 
-module.exports = { startDevServer, installPackage, createProject };
+module.exports = {
+  startDevServer,
+  installPackage,
+  createProject,
+  cloneSandbox,
+};
