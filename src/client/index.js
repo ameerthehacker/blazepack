@@ -42,20 +42,21 @@ function getSandboxTemplateName(sandboxFiles) {
 
 ws.onmessage = (evt) => {
   const { type, data } = JSON.parse(evt.data);
-  
+
   try {
     switch (type) {
       case WS_EVENTS.INIT: {
         sandboxFiles = data;
         const sandboxTemplate = getSandboxTemplateName(sandboxFiles);
         const sandboxTemplateDefinition = getTemplateDefinition(sandboxTemplate);
-        const htmlEntryFiles = sandboxTemplateDefinition.getHTMLEntries();
+        // sandpack throws error for angular for some unknown reason
+        const htmlEntryFiles = sandboxTemplateDefinition.name === 'angular-cli' ? ['/src/index.html'] : sandboxTemplateDefinition.getHTMLEntries();
 
         for (const htmlEntryFile of htmlEntryFiles) {
           if (sandboxFiles[htmlEntryFile] && sandboxFiles[htmlEntryFile].code) {
             const htmlContent = sandboxFiles[htmlEntryFile].code;
             const { head } = getHTMLParts(htmlContent);
-  
+
             document.head.innerHTML = head;
           }
         }
@@ -65,7 +66,7 @@ ws.onmessage = (evt) => {
           codesandbox: true,
           externalResources: [],
           template: getSandboxTemplateName(sandboxFiles),
-          isInitializationCompile: true 
+          isInitializationCompile: true
         });
 
         break;
@@ -92,19 +93,19 @@ ws.onmessage = (evt) => {
           externalResources: [],
           template: getSandboxTemplateName(updatedFiles)
         });
-        
+
         break;
       }
     }
-  } catch(e) {
-     ws.send(
-       JSON.stringify({
-         type: WS_EVENTS.UNHANDLED_SANDPACK_ERROR,
-         data: {
-           title: "Unhandled Sandpack error while running the app.",
-           message: e.message,
-         },
-       })
-     );
+  } catch (e) {
+    ws.send(
+      JSON.stringify({
+        type: WS_EVENTS.UNHANDLED_SANDPACK_ERROR,
+        data: {
+          title: "Unhandled Sandpack error while running the app.",
+          message: e.message,
+        },
+      })
+    );
   }
 }
