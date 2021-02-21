@@ -1,16 +1,14 @@
-import { Manager } from './sandpack';
-import { name } from '../../package.json';
 import { WS_EVENTS } from '../constants';
+import { name } from '../../package.json';
 
-let sandpackManager = new Manager('#root', { showOpenInCodeSandbox: false });
+const compile = window.compile;
+const getSandboxTemplate = window.getTemplate;
+const getTemplateDefinition = window.getTemplateDefinition;
 const info = (message) => console.log(`${name}: ${message}`)
 const ws = new WebSocket(`ws://${window.location.host}`);
 let sandboxFiles;
-let historyStateUID = 0;
 
-function getRelativeUrl(url) {
-  return url.replace(sandpackManager.bundlerURL, "");
-}
+ws.onopen = () => info('connected');
 
 function getFilename(filePath) {
   const fileParts = filePath.split('/');
@@ -19,49 +17,56 @@ function getFilename(filePath) {
   return filename;
 }
 
-window.onpopstate = () => {
-  // back btn
-  if (!history.state || (historyStateUID > history.state.uid)) {
-    sandpackManager.dispatch({ type: 'urlback' });
-  } else {
-    sandpackManager.dispatch({ type: 'urlforward' });
+export function getHTMLParts(html) {
+  if (html.includes('<body>')) {
+    const bodyMatcher = /<body.*>([\s\S]*)<\/body>/m;
+    const headMatcher = /<head>([\s\S]*)<\/head>/m;
+
+    const headMatch = html.match(headMatcher);
+    const bodyMatch = html.match(bodyMatcher);
+    const head = headMatch && headMatch[1] ? headMatch[1] : '';
+    const body = bodyMatch && bodyMatch[1] ? bodyMatch[1] : html;
+
+    return { body, head };
   }
+
+  return { head: '', body: html };
 }
 
-sandpackManager.listen((evt) => {
-  switch (evt.type) {
-    case "urlchange": {
-      const relativeUrl = getRelativeUrl(evt.url);
+function getSandboxTemplateName(sandboxFiles) {
+  const packageJSON = JSON.parse(sandboxFiles['/package.json'].code);
+  const sandboxTemplate = getSandboxTemplate(packageJSON, sandboxFiles);
 
-      history.pushState({ uid: historyStateUID }, '', relativeUrl);
-      historyStateUID++;
-
-      break;
-    }
-    case "action": {
-      if (evt.action === "show-error") {
-        ws.send(JSON.stringify({ type: WS_EVENTS.ERROR, data: { title: evt.title, message: evt.message } }));
-      }
-
-      break;
-    }
-  }
-});
-
-
-ws.onopen = () => info('connected');
+  return sandboxTemplate;
+}
 
 ws.onmessage = (evt) => {
   const { type, data } = JSON.parse(evt.data);
-  
+
   try {
     switch (type) {
       case WS_EVENTS.INIT: {
         sandboxFiles = data;
+        const sandboxTemplate = getSandboxTemplateName(sandboxFiles);
+        const sandboxTemplateDefinition = getTemplateDefinition(sandboxTemplate);
+        // sandpack throws error for angular for some unknown reason
+        const htmlEntryFiles = sandboxTemplateDefinition.name === 'angular-cli' ? ['/src/index.html'] : sandboxTemplateDefinition.getHTMLEntries();
 
-        sandpackManager.updatePreview({
-          files: data,
-          showOpenInCodeSandbox: false,
+        for (const htmlEntryFile of htmlEntryFiles) {
+          if (sandboxFiles[htmlEntryFile] && sandboxFiles[htmlEntryFile].code) {
+            const htmlContent = sandboxFiles[htmlEntryFile].code;
+            const { head } = getHTMLParts(htmlContent);
+
+            document.head.innerHTML = head;
+          }
+        }
+
+        compile({
+          modules: sandboxFiles,
+          codesandbox: true,
+          externalResources: [],
+          template: getSandboxTemplateName(sandboxFiles),
+          isInitializationCompile: true
         });
 
         break;
@@ -80,24 +85,27 @@ ws.onmessage = (evt) => {
           window.location.reload();
         }
 
-        const updatedFiles = { ...sandboxFiles, [path]: { code: fileContent } };
+        const updatedFiles = { ...sandboxFiles, [path]: { code: fileContent, path } };
 
-        sandpackManager.updatePreview({
-          files: updatedFiles,
-          showOpenInCodeSandbox: false,
+        compile({
+          modules: updatedFiles,
+          codesandbox: true,
+          externalResources: [],
+          template: getSandboxTemplateName(updatedFiles)
         });
+
         break;
       }
     }
-  } catch(e) {
-     ws.send(
-       JSON.stringify({
-         type: WS_EVENTS.UNHANDLED_SANDPACK_ERROR,
-         data: {
-           title: "Unhandled Sandpack error while running the app.",
-           message: e.message,
-         },
-       })
-     );
+  } catch (e) {
+    ws.send(
+      JSON.stringify({
+        type: WS_EVENTS.UNHANDLED_SANDPACK_ERROR,
+        data: {
+          title: "Unhandled Sandpack error while running the app.",
+          message: e.message,
+        },
+      })
+    );
   }
 }

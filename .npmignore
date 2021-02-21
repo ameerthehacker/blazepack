@@ -5,3 +5,4 @@ src/client/
 # unwanted files
 .cache/
 playground/
+src/client/www
