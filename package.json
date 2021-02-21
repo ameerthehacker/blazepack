@@ -1,6 +1,6 @@
 {
   "name": "blazepack",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Blazing fast dev server powered by smooshpack",
   "main": "./bin/blazepack.js",
   "bin": {
