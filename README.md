@@ -88,8 +88,9 @@ You can clone an existing codesandox, by just running the below commands:
 blazepack clone https://codesandbox.io/s/use-undo-redo-yrts1
 ```
 
+**Cloning from embed url**
+
 ```
-# Cloning from embed url
 blazepack clone https://codesandbox.io/embed/use-undo-redo-yrts1
 ```
 
