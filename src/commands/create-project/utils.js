@@ -25,8 +25,13 @@ function downloadFileToTemp(url) {
   return new Promise((resolve, reject) => {
     https.get(url, (response) => {
       if (response.statusCode == 200) {
-        response.pipe(tempFile);
-        resolve(tempFileName);
+        response.pipe(tempFile)
+        .on('finish', () => {
+          resolve(tempFileName);
+        })
+        .on('error', (err) => {
+          resolve(`failed to extract template ${err}`);
+        });
       } else {
         reject(`failed to download template from ${url}`);
       }

@@ -49,13 +49,15 @@ ws.onmessage = (evt) => {
         sandboxFiles = data;
         const sandboxTemplate = getSandboxTemplateName(sandboxFiles);
         const sandboxTemplateDefinition = getTemplateDefinition(sandboxTemplate);
-        const htmlEntryFile = sandboxTemplateDefinition.getHTMLEntries()[0];
+        const htmlEntryFiles = sandboxTemplateDefinition.getHTMLEntries();
 
-        if (htmlEntryFile) {
-          const htmlContent = sandboxFiles[htmlEntryFile].code;
-          const { head } = getHTMLParts(htmlContent);
-
-          document.head.innerHTML = head;
+        for (const htmlEntryFile of htmlEntryFiles) {
+          if (sandboxFiles[htmlEntryFile] && sandboxFiles[htmlEntryFile].code) {
+            const htmlContent = sandboxFiles[htmlEntryFile].code;
+            const { head } = getHTMLParts(htmlContent);
+  
+            document.head.innerHTML = head;
+          }
         }
 
         compile({
