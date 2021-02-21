@@ -3,44 +3,32 @@ const fs = require('fs');
 const path = require('path');
 const getAllFiles = require('get-all-files').default;
 const WebSocket = require('ws');
-const { WS_EVENTS } = require('./constants');
+const { WS_EVENTS } = require('../../constants');
 const chokidar = require('chokidar');
 const open = require('open');
 const {
   isImage,
-  toDataUrl,
-  logError,
-  logInfo,
+  readAsDataUrlSync,
   getPosixPath,
-  getSandboxFiles,
-  createSandboxFiles,
 } = require("./utils");
-
-
-async function cloneSandbox({id}) {
-  try {
-    logInfo("📥 Fetching sandbox info...");  
-    const res = await getSandboxFiles(id);
-    logInfo("📁 Creating files & directories"); 
-    await createSandboxFiles(res.data);
-    logInfo("✅ Sandbox cloned");  
-  } catch(e) {
-    logError(`😢 Unable to clone sandbox: ${e}`);
-  }
-}
+const {
+  logError,
+  logInfo
+} = require('../../utils');
 
 function startDevServer(directory, port) {
-  const EXCLUDED_DIRECTORIES = [
+  const IGNORED_DIRECTORIES = [
     /node_modules/,
     /.git/,
     /.cache/
   ];
-  const EXCLUDED_FILES = [
+  const IGNORED_FILES = [
     /yarn.lock/,
     /package-lock.json/,
     /.gitignore/
   ]
-  const WWW_PATH = path.join(__dirname, 'client', 'www');
+  const ROOT_DIR = path.join(__dirname, '..', '..');
+  const WWW_PATH = path.join(ROOT_DIR, 'client', 'www');
   const INDEX_HTML_PATH = path.join(WWW_PATH, 'index.html');
   const assetExistsInStaticPath = (url) => {
     const assetPath = path.join(WWW_PATH, url);
@@ -58,13 +46,13 @@ function startDevServer(directory, port) {
     // get all files in the dir except node modules
     const filePaths = getAllFiles.sync.array(directory, {
       resolve: true,
-      isExcludedDir: (dirname) => EXCLUDED_DIRECTORIES.find(excludedDir => excludedDir.test(dirname))
+      isExcludedDir: (dirname) => IGNORED_DIRECTORIES.find(excludedDir => excludedDir.test(dirname))
     });
   
   
     filePaths.forEach(filePath => {
       // we don't want to read unneccessary huge files
-      const isExcludedFile = EXCLUDED_FILES.find(excludedFile => excludedFile.test(filePath));
+      const isExcludedFile = IGNORED_FILES.find(excludedFile => excludedFile.test(filePath));
       const filename = path.basename(filePath);
   
       if (isExcludedFile) return;
@@ -73,7 +61,7 @@ function startDevServer(directory, port) {
       let fileContent;
 
       if (isImage(filename)) {
-        fileContent = toDataUrl(filePath);
+        fileContent = readAsDataUrlSync(filePath);
       } else {
         fileContent = fs.readFileSync(filePath, 'utf-8');
       }
@@ -179,7 +167,4 @@ function startDevServer(directory, port) {
   }
 }
 
-module.exports = {
-  startDevServer,
-  cloneSandbox
-};
+module.exports = startDevServer;

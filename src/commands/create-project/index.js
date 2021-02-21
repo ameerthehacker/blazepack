@@ -3,6 +3,7 @@ const path = require('path');
 const { logInfo, logError } = require('../../utils');
 const extractZip = require('extract-zip');
 const { getTemplateURL, downloadFileToTemp } = require('./utils');
+const startDevServer = require('../start-dev-server');
 
 async function createProject({ projectName, template, startServer, port }) {
   try {
