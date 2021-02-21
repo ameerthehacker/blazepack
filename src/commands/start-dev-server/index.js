@@ -1,4 +1,5 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const getAllFiles = require('get-all-files').default;
@@ -10,6 +11,7 @@ const {
   isImage,
   readAsDataUrlSync,
   getPosixPath,
+  getExtension,
 } = require("./utils");
 const {
   logError,
@@ -30,14 +32,15 @@ function startDevServer(directory, port) {
   const ROOT_DIR = path.join(__dirname, '..', '..');
   const WWW_PATH = path.join(ROOT_DIR, 'client', 'www');
   const INDEX_HTML_PATH = path.join(WWW_PATH, 'index.html');
+  const isSandpackAvailableLocally = process.env.SANDPACK_LOCAL;
   const assetExistsInStaticPath = (url) => {
     const assetPath = path.join(WWW_PATH, url);
-  
+
     return fs.existsSync(assetPath);
   }
   const sendIndexHTML = (res) => {
     const indexHTMLContent = fs.readFileSync(INDEX_HTML_PATH, 'utf-8');
-  
+
     res.write(indexHTMLContent);
     res.end();
   }
@@ -48,15 +51,15 @@ function startDevServer(directory, port) {
       resolve: true,
       isExcludedDir: (dirname) => IGNORED_DIRECTORIES.find(excludedDir => excludedDir.test(dirname))
     });
-  
-  
+
+
     filePaths.forEach(filePath => {
       // we don't want to read unneccessary huge files
       const isExcludedFile = IGNORED_FILES.find(excludedFile => excludedFile.test(filePath));
       const filename = path.basename(filePath);
-  
+
       if (isExcludedFile) return;
-  
+
       const relativePath = getPosixPath(path.relative(directory, filePath));
       let fileContent;
 
@@ -67,38 +70,95 @@ function startDevServer(directory, port) {
       }
 
       const sandboxFilePath = `/${relativePath}`;
-  
+
       sandboxFiles[sandboxFilePath] = {
         code: fileContent,
         path: sandboxFilePath
       };
     });
-  
+
     return sandboxFiles;
   }
-  
-  const httpServer = http.createServer((req, res) => {
+
+  const localSandpackServer = (req, res) => {
     if (req.url === '/') {
       sendIndexHTML(res);
+    } else if (req.url === '/index.js') {
+      const clientJSPath = path.join(ROOT_DIR, 'lib', 'index.js');
+      const assetContent = fs.readFileSync(clientJSPath, 'utf-8');
+      res.setHeader('Content-Type', 'text/javascript');
+
+      res.write(assetContent);
+      res.end();
     } else {
       if (assetExistsInStaticPath(req.url)) {
         const assetPath = path.join(WWW_PATH, req.url);
         const assetContent = fs.readFileSync(assetPath, 'utf-8');
+
         res.setHeader('Content-Type', 'text/javascript');
-  
         res.write(assetContent);
         res.end();
       } else {
         sendIndexHTML(res);
       }
     }
-  });
+  };
 
+  // we have our own sandpack hosted in unpkg for flexibility
+  // we proxy all requests except /index.js file
+  const selfHostedSandpackServer = (req, res) => {
+    let url;
+
+    if (req.url === '/') {
+      url = '/index.html';
+    } else if (req.url === '/index.js') {
+      const clientJSPath = path.join(ROOT_DIR, 'lib', 'index.js');
+      const assetContent = fs.readFileSync(clientJSPath, 'utf-8');
+
+      res.setHeader('Content-Type', 'text/javascript');
+      res.write(assetContent);
+      res.end();
+
+      return;
+    } else {
+      const filename = path.basename(req.url);
+      const ext = getExtension(filename);
+      const allowedExt = ['js', 'html', 'css', 'json'];
+
+      if (allowedExt.includes(ext)) {
+        url = req.url;
+      } else {
+        url = '/index.html';
+      }
+    }
+
+    const options = {
+      hostname: 'www.unpkg.com',
+      path: `/blazepack-core@0.0.1/www/${url}`,
+      method: req.method
+    };
+
+    const proxyReq = https.request(options, function (proxyRes) {
+      let body = '';
+
+      proxyRes.on('data', function (chunk) {
+        body += chunk;
+      });
+
+      proxyRes.on('end', function () {
+        res.writeHead(proxyRes.statusCode, proxyRes.headers);
+        res.end(body);
+      });
+    });
+    proxyReq.end();
+  };
+
+  const httpServer = http.createServer(isSandpackAvailableLocally ? localSandpackServer : selfHostedSandpackServer);
   const wsServer = new WebSocket.Server({ server: httpServer });
-  
+
   wsServer.on('connection', (ws) => {
     const sandboxFiles = getSandboxFiles(directory);
-  
+
     ws.send(JSON.stringify({
       type: WS_EVENTS.INIT,
       data: sandboxFiles
@@ -108,11 +168,11 @@ function startDevServer(directory, port) {
       const { type, data } = JSON.parse(evt);
       const { title, message } = data;
 
-      switch(type) {
+      switch (type) {
         case WS_EVENTS.ERROR: {
           logError(title);
           logError(message);
-          
+
           break;
         }
         case WS_EVENTS.UNHANDLED_SANDPACK_ERROR: {
@@ -130,30 +190,30 @@ function startDevServer(directory, port) {
 
   httpServer.listen(port, () => {
     chokidar.watch(directory, { ignoreInitial: true })
-    .on('ready', () => {
-      console.log(`⚡ Blazepack dev server running at http://localhost:${port}`);
-  
-      open(`http://localhost:${port}`);
-    })
-    .on('all', (event, filePath) => {
-      const relativePath = `/${getPosixPath(path.relative(directory, filePath))}`;
-      let fileContent;
-  
-      if (event !== 'unlink' && event !== 'unlinkDir') {
-        fileContent = fs.readFileSync(filePath, 'utf-8');
-      }
-  
-      wsServer.clients.forEach(client => {
-        client.send(JSON.stringify({
-          type: WS_EVENTS.PATCH,
-          data: {
-            event,
-            path: relativePath,
-            fileContent
-          }
-        }));
+      .on('ready', () => {
+        console.log(`⚡ Blazepack dev server running at http://localhost:${port}`);
+
+        open(`http://localhost:${port}`);
+      })
+      .on('all', (event, filePath) => {
+        const relativePath = `/${getPosixPath(path.relative(directory, filePath))}`;
+        let fileContent;
+
+        if (event !== 'unlink' && event !== 'unlinkDir') {
+          fileContent = fs.readFileSync(filePath, 'utf-8');
+        }
+
+        wsServer.clients.forEach(client => {
+          client.send(JSON.stringify({
+            type: WS_EVENTS.PATCH,
+            data: {
+              event,
+              path: relativePath,
+              fileContent
+            }
+          }));
+        });
       });
-    });
   });
 
   if (process.env.NODE_ENV !== 'development') {

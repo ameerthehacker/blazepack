@@ -21,9 +21,9 @@ function readAsDataUrlSync(filePath) {
 }
 
 function getExtension(filename) {
-  const [, ext] = filename.split('.');
+  const fileParts = filename.split('.');
 
-  return ext;
+  return fileParts[fileParts.length - 1];
 }
 
 module.exports = {
