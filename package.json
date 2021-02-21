@@ -7,8 +7,8 @@
     "blazepack": "./bin/blazepack.js"
   },
   "scripts": {
-    "build-client": "parcel build src/client/index.js --out-dir src/client/www",
-    "dev-client": "parcel src/client/index.js --out-dir src/client/www",
+    "build-client": "parcel build src/client/index.js --out-dir src/lib",
+    "dev-client": "parcel src/client/index.js --out-dir src/lib",
     "prepublish": "npm run build-client"
   },
   "repository": {

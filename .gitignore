@@ -120,3 +120,4 @@ dist
 src/static/index.js
 playground/
 src/client/www
+lib/

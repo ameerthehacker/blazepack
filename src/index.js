@@ -10,43 +10,12 @@ const {
   isImage,
   toDataUrl,
   logError,
-  logSuccess,
   logInfo,
-  getTemplateURL,
-  downloadFileToTemp,
   getPosixPath,
   getSandboxFiles,
   createSandboxFiles,
 } = require("./utils");
-const findPackageJSON = require('find-package-json');
-const detectIndent = require('detect-indent');
-const getLatestVersion = require('latest-version');
-const extractZip = require('extract-zip');
 
-async function createProject({ projectName, template, startServer, port }) {
- try {
-  const projectPath = path.join(process.cwd(), projectName);
-
-  if (fs.existsSync(projectPath)) {
-    logError(`Sorry a directory with name ${projectName} already exists!`);
-    
-    process.exit(1);
-  }
-
-  logInfo(`Downloading the template ${template}...`)
-
-  const templateURL = await getTemplateURL(template);
-  const fileName = await downloadFileToTemp(templateURL);
-
-  await extractZip(fileName, {
-    dir: projectPath
-  });
-
-  if(startServer) startDevServer(projectPath, port);
- } catch(err) {
-   console.log(`Unable to create new project: ${err}`);
- }
-}
 
 async function cloneSandbox({id}) {
   try {
@@ -57,41 +26,6 @@ async function cloneSandbox({id}) {
     logInfo("✅ Sandbox cloned");  
   } catch(e) {
     logError(`😢 Unable to clone sandbox: ${e}`);
-  }
-}
-
-async function installPackage(package) {
-  try {
-    const [packageName, version] = package.split('@');
-    const iterator = findPackageJSON();
-    const nextPackageJSON = iterator.next();
-
-    if (nextPackageJSON) {
-      const packageJSONContent = fs.readFileSync(nextPackageJSON.filename, 'utf-8');
-      const packageJSON = JSON.parse(packageJSONContent);
-      const latestVersion = await getLatestVersion(packageName);
-      const packageVersion = version || latestVersion;
-  
-      if (packageJSON.dependencies) {
-        packageJSON.dependencies = {
-          ...packageJSON.dependencies,
-          [packageName]: `^${packageVersion}`
-        }
-      }
-  
-      // detectIntent keeps up the indentation of the original file preserved 
-      fs.writeFileSync(nextPackageJSON.filename, JSON.stringify(packageJSON, null, detectIndent(packageJSONContent).indent || 2));
-
-      logSuccess(`Installed package ${packageName}@${packageVersion}`);
-    } else {
-      logError('Unable to find package.json for the project');
-    }
-  } catch(err) {
-    if (err.name === 'PackageNotFoundError')  {
-      logError(`Unable to find package ${package} in the npm registry`);
-    } else {
-      logError(`Unable to install package ${package}: ${err}`);
-    }
   }
 }
 
@@ -247,7 +181,5 @@ function startDevServer(directory, port) {
 
 module.exports = {
   startDevServer,
-  installPackage,
-  createProject,
-  cloneSandbox,
+  cloneSandbox
 };

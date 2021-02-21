@@ -43,35 +43,6 @@ function logInfo(message) {
   console.log(blue(message));
 }
 
-async function getTemplateURL(template) {
-  const version = await latestVersion('blazepack-templates');
-
-  return `https://www.unpkg.com/blazepack-templates@${version}/templates/${template}.zip`;
-}
-
-function generateRandomHash() {
-  const timeStamp = (new Date()).valueOf().toString();
-  const random = Math.random().toString();
-
-  return crypto.createHash('sha1').update(timeStamp + random).digest('hex');
-}
-
-function downloadFileToTemp(url) {
-  const tempFileName = path.join(os.tmpdir(), `${generateRandomHash()}.zip`);
-  const tempFile = fs.createWriteStream(tempFileName);
-
-  return new Promise((resolve, reject) => {
-    https.get(url, (response) => {
-      if (response.statusCode == 200) {
-        response.pipe(tempFile);
-        resolve(tempFileName);
-      } else {
-        reject(`failed to download template from ${url}`);
-      }
-    });
-  });
-}
-
 function getSandboxFiles(id) {
   return new Promise((resolve, reject) => {
     https
@@ -195,9 +166,6 @@ module.exports = {
   logError,
   logInfo,
   logSuccess,
-  getTemplateURL,
-  generateRandomHash,
-  downloadFileToTemp,
   getPosixPath,
   getSandboxFiles,
   createSandboxFiles,

@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 const parseArgs = require('minimist');
-const { startDevServer, installPackage, createProject,cloneSandbox } = require('../src');
+const { startDevServer, cloneSandbox } = require('../src');
+const createProject = require('../src/commands/create-project');
+const installPackage = require('../src/commands/install-package');
 const { version } = require('../package.json');
 const { logError, logInfo } = require('../src/utils');
 

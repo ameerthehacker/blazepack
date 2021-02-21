@@ -7,7 +7,6 @@ const getTemplateDefinition = window.getTemplateDefinition;
 const info = (message) => console.log(`${name}: ${message}`)
 const ws = new WebSocket(`ws://${window.location.host}`);
 let sandboxFiles;
-let manager;
 
 ws.onopen = () => info('connected');
 
