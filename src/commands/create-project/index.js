@@ -1,10 +1,12 @@
 const fs = require('fs');
 const path = require('path');
-const { logInfo, logError, logSuccess } = require("../../utils");
 const {
+  logInfo,
+  logError,
+  logSuccess,
   getSandboxFiles,
   createSandboxFiles,
-} = require("../../utils/get-sandbox");
+} = require("../../utils");
 const startDevServer = require('../start-dev-server');
 
 async function createProject({ projectName, templateId, startServer, port }) {

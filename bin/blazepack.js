@@ -23,6 +23,8 @@ function validateNewProject(projectName, template) {
     svelte: "svelte",
   };
 
+  const availableTemplates = Object.keys(officialTemplates).join(", ");
+
   if (!projectName) {
     logError(`Required argument project name was not provied`);
 
@@ -35,8 +37,11 @@ function validateNewProject(projectName, template) {
     template = 'react';
   }
 
+
   if (!officialTemplates[template]) {
-    logError(`Unknown template ${template}, available options are ${Object.keys(officialTemplates).join(',')}`);
+    logError(
+      `Unknown template ${template}, available options are ${availableTemplates}`
+    );
 
     process.exit(1);
   }

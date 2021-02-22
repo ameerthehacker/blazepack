@@ -1,5 +1,10 @@
-const { getSandboxFiles, createSandboxFiles } = require('../../utils/get-sandbox');
-const { logInfo, logError, logSuccess } = require('../../utils');
+const {
+  logInfo,
+  logError,
+  logSuccess,
+  getSandboxFiles,
+  createSandboxFiles,
+} = require("../../utils");
 
 async function cloneSandbox({id}) {
   try {
