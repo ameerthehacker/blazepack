@@ -1,4 +1,4 @@
-const { getSandboxFiles, createSandboxFiles } = require('./utils');
+const { getSandboxFiles, createSandboxFiles } = require('../../utils/get-sandbox');
 const { logInfo, logError, logSuccess } = require('../../utils');
 
 async function cloneSandbox({id}) {

@@ -1,6 +1,6 @@
-const https = require('https');
-const fs = require('fs');
-const path = require('path');
+const https = require("https");
+const fs = require("fs");
+const path = require("path");
 
 function getSandboxFiles(id) {
   return new Promise((resolve, reject) => {
@@ -25,8 +25,8 @@ function getSandboxFiles(id) {
   });
 }
 
-async function createSandboxFiles(sandboxInfo) {
-  /** 
+async function createSandboxFiles(sandboxInfo, projectName) {
+  /**
    * Object of all directories
    *
    * For eg:
@@ -71,7 +71,7 @@ async function createSandboxFiles(sandboxInfo) {
     return `${directories[id].title}/${currentDir}`;
   };
 
-  /** 
+  /**
    * Directories object with nested path
    *
    * {
@@ -89,10 +89,10 @@ async function createSandboxFiles(sandboxInfo) {
    */
   const projectPath = path.join(
     process.cwd(),
-    sandboxInfo.title || sandboxInfo.id
+    projectName || sandboxInfo.title || sandboxInfo.id
   );
 
-  /** 
+  /**
    * Create all directories, recursice: true; forces the directory creation if not present
    */
   Object.keys(directoriesWithPath).forEach(async (dir) => {
@@ -120,5 +120,5 @@ async function createSandboxFiles(sandboxInfo) {
 
 module.exports = {
   getSandboxFiles,
-  createSandboxFiles
-}
+  createSandboxFiles,
+};

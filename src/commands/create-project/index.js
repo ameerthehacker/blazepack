@@ -1,11 +1,13 @@
 const fs = require('fs');
 const path = require('path');
-const { logInfo, logError } = require('../../utils');
-const extractZip = require('extract-zip');
-const { getTemplateURL, downloadFileToTemp } = require('./utils');
+const { logInfo, logError, logSuccess } = require("../../utils");
+const {
+  getSandboxFiles,
+  createSandboxFiles,
+} = require("../../utils/get-sandbox");
 const startDevServer = require('../start-dev-server');
 
-async function createProject({ projectName, template, startServer, port }) {
+async function createProject({ projectName, templateId, startServer, port }) {
   try {
     const projectPath = path.join(process.cwd(), projectName);
 
@@ -15,16 +17,16 @@ async function createProject({ projectName, template, startServer, port }) {
       process.exit(1);
     }
 
-    logInfo(`Downloading the template ${template}...`)
-
-    const templateURL = await getTemplateURL(template);
-    const fileName = await downloadFileToTemp(templateURL);
-
-    await extractZip(fileName, {
-      dir: projectPath
-    });
-
-    if (startServer) startDevServer(projectPath, port);
+    logInfo(`📥 Downloading template...`); 
+    const res = await getSandboxFiles(templateId);
+    logInfo("📁 Creating files & directories");
+    await createSandboxFiles(res.data, projectName);
+    logSuccess("✅ Project created");
+    
+    if (startServer) {
+      logInfo(`Starting project ${projectName}...`);
+      startDevServer(projectPath, port);
+    }
   } catch (err) {
     logError(`Unable to create new project: ${err}`);
   }
