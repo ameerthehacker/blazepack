@@ -4,6 +4,15 @@
   Blazing fast dev server powered by <a href="https://www.npmjs.com/package/smooshpack">sandpack</a>
 </p>
 
+<p align="center">
+  <a href="https://discord.gg/ZP6p5dVwnn">
+  <img src="https://img.shields.io/discord/591914197219016707.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
+  </a>
+  <a href="http://makeapullrequest.com">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome">
+  </a>
+</p>
+
 ## Motivation
 
 I always wanted the super fast feedback that codesandbox provides in my local environment, so I have built a tiny wrapper around the codesandbox bundler sandpack and it runs locally 🎉
