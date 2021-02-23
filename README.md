@@ -100,6 +100,28 @@ blazepack clone https://codesandbox.io/embed/use-undo-redo-yrts1
 blazepack clone use-undo-redo-yrts1
 ```
 
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://ameerthehacker.me/"><img src="https://avatars.githubusercontent.com/u/15448192?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ameer Jhan</b></sub></a><br /><a href="https://github.com/ameerthehacker/blazepack/commits?author=ameerthehacker" title="Code">💻</a> <a href="https://github.com/ameerthehacker/blazepack/commits?author=ameerthehacker" title="Documentation">📖</a> <a href="https://github.com/ameerthehacker/blazepack/issues?q=author%3Aameerthehacker" title="Bug reports">🐛</a> <a href="#ideas-ameerthehacker" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://bit.ly/jyash97"><img src="https://avatars.githubusercontent.com/u/22376783?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Yash Joshi</b></sub></a><br /><a href="https://github.com/ameerthehacker/blazepack/commits?author=jyash97" title="Code">💻</a> <a href="https://github.com/ameerthehacker/blazepack/commits?author=jyash97" title="Documentation">📖</a> <a href="https://github.com/ameerthehacker/blazepack/issues?q=author%3Ajyash97" title="Bug reports">🐛</a> <a href="#ideas-jyash97" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/philipjmurphy"><img src="https://avatars.githubusercontent.com/u/1055915?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Philip Murphy</b></sub></a><br /><a href="https://github.com/ameerthehacker/blazepack/commits?author=philipjmurphy" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/sahilrajput03"><img src="https://avatars.githubusercontent.com/u/31458531?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Sahil Rajput</b></sub></a><br /><a href="https://github.com/ameerthehacker/blazepack/commits?author=sahilrajput03" title="Documentation">📖</a> <a href="#ideas-sahilrajput03" title="Ideas, Planning, & Feedback">🤔</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
 Show your support by ⭐ the repo
 

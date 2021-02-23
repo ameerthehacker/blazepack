@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/ameerthehacker/blazepack#readme",
   "devDependencies": {
+    "all-contributors-cli": "^6.20.0",
     "parcel-bundler": "^1.12.4"
   },
   "dependencies": {
