@@ -13,7 +13,17 @@ const DEFAULT_PORT = 3000;
 const PORT = args.port || DEFAULT_PORT;
 
 function validateNewProject(projectName, template) {
-  const availableTemplates = ['react', 'preact', 'angular', 'vue2', 'vue3', 'svelte'];
+  const officialTemplates = {
+    react: "new",
+    vanilla: "vanilla",
+    preact: "preact",
+    vue2: "vue",
+    vue3: "vue-3",
+    angular: "angular",
+    svelte: "svelte",
+  };
+
+  const availableTemplates = Object.keys(officialTemplates).join(", ");
 
   if (!projectName) {
     logError(`Required argument project name was not provided`);
@@ -27,13 +37,16 @@ function validateNewProject(projectName, template) {
     template = 'react';
   }
 
-  if (!availableTemplates.includes(template)) {
-    logError(`Unknown template ${template}, available options are ${availableTemplates.join(',')}`);
+
+  if (!officialTemplates[template]) {
+    logError(
+      `Unknown template ${template}, available options are ${availableTemplates}`
+    );
 
     process.exit(1);
   }
 
-  return template;
+  return officialTemplates[template];
 }
 
 if (args.version) {
@@ -54,21 +67,26 @@ if (args.version) {
     }
     case "create": {
       const projectName = args._[1];
-      let template = args.template;
+      const template = args.template;
+      
+      const templateId = validateNewProject(projectName, template);
 
-      template = validateNewProject(projectName, template);
-
-      createProject({ projectName, template, startServer: false, port: PORT });
+      createProject({
+        projectName,
+        templateId,
+        startServer: false,
+        port: PORT,
+      });
 
       break;
     }
     case "start": {
       const projectName = args._[1];
-      let template = args.template;
+      const template = args.template;
 
-      template = validateNewProject(projectName, template);
+      const templateId = validateNewProject(projectName, template);
 
-      createProject({ projectName, template, startServer: true, port: PORT });
+      createProject({ projectName, templateId, startServer: true, port: PORT });
 
       break;
     }

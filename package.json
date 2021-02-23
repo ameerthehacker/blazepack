@@ -34,7 +34,6 @@
     "chalk": "^4.1.0",
     "chokidar": "^3.5.1",
     "detect-indent": "^6.0.0",
-    "extract-zip": "^2.0.1",
     "find-package-json": "^1.2.0",
     "get-all-files": "^3.0.0",
     "latest-version": "^5.1.0",
