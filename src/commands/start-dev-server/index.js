@@ -199,8 +199,8 @@ function startDevServer(directory, port) {
         const relativePath = `/${getPosixPath(path.relative(directory, filePath))}`;
         let fileContent;
 
-        if (event !== "unlink" && event !== "unlinkDir" && event !== "addDir") {
-          fileContent = fs.readFileSync(filePath, "utf-8");
+        if (event !== 'unlink' && event !== 'unlinkDir' && event !== 'addDir') {
+          fileContent = fs.readFileSync(filePath, 'utf-8');
         }
 
         wsServer.clients.forEach(client => {

@@ -26,7 +26,7 @@ function getSandboxFiles(id) {
 }
 
 async function createSandboxFiles(sandboxInfo) {
-  /**
+  /** 
    * Object of all directories
    *
    * For eg:
@@ -71,7 +71,7 @@ async function createSandboxFiles(sandboxInfo) {
     return `${directories[id].title}/${currentDir}`;
   };
 
-  /**
+  /** 
    * Directories object with nested path
    *
    * {
@@ -92,7 +92,7 @@ async function createSandboxFiles(sandboxInfo) {
     sandboxInfo.title || sandboxInfo.id
   );
 
-  /**
+  /** 
    * Create all directories, recursive: true; forces the directory creation if not present
    */
   Object.keys(directoriesWithPath).forEach(async (dir) => {
