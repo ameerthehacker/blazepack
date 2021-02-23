@@ -26,7 +26,7 @@ function validateNewProject(projectName, template) {
   const availableTemplates = Object.keys(officialTemplates).join(", ");
 
   if (!projectName) {
-    logError(`Required argument project name was not provied`);
+    logError(`Required argument project name was not provided`);
 
     process.exit(1);
   }
@@ -57,7 +57,7 @@ if (args.version) {
       const package = args._[1];
 
       if (!package) {
-        logError(`Required argument package name was not provied`);
+        logError(`Required argument package name was not provided`);
 
         process.exit(1);
       }
