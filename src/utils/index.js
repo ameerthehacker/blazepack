@@ -1,5 +1,7 @@
 const { red, blue, green } = require('chalk');
 const https = require("https");
+const findPackageJSON = require("find-package-json");
+const detectIndent = require("detect-indent");
 const fs = require("fs");
 const path = require("path");
 const Stream = require('stream').Transform;
@@ -173,6 +175,28 @@ async function createSandboxFiles(sandboxInfo, projectName) {
   });
 }
 
+const getPackageJSON = () => {
+   const iterator = findPackageJSON();
+    const nextPackageJSON = iterator.next();
+
+    if (nextPackageJSON && nextPackageJSON.filename) {
+      const packageJSONContent = fs.readFileSync(
+        nextPackageJSON.filename,
+        "utf-8"
+      );
+
+      const packageJSON = JSON.parse(packageJSONContent);
+
+      return {
+        file: nextPackageJSON.filename,
+        indent: detectIndent(packageJSONContent).indent || 2,
+        json: packageJSON,
+      };
+    }
+
+    return null;
+}
+
 module.exports = {
   logError,
   logInfo,
@@ -180,5 +204,6 @@ module.exports = {
   getSandboxFiles,
   createSandboxFiles,
   isImage,
-  getExtension
+  getExtension,
+  getPackageJSON,
 };
