@@ -54,7 +54,7 @@ function startDevServer(directory, port) {
 
 
     filePaths.forEach(filePath => {
-      // we don't want to read unneccessary huge files
+      // we don't want to read unnecessary huge files
       const isExcludedFile = IGNORED_FILES.find(excludedFile => excludedFile.test(filePath));
       const filename = path.basename(filePath);
 
@@ -199,7 +199,7 @@ function startDevServer(directory, port) {
         const relativePath = `/${getPosixPath(path.relative(directory, filePath))}`;
         let fileContent;
 
-        if (event !== 'unlink' && event !== 'unlinkDir') {
+        if (event !== 'unlink' && event !== 'unlinkDir' && event !== 'addDir') {
           fileContent = fs.readFileSync(filePath, 'utf-8');
         }
 
