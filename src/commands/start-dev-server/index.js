@@ -18,6 +18,8 @@ const {
   getExtension
 } = require('../../utils');
 
+let sandboxFiles;
+
 function startDevServer(directory, port) {
   const IGNORED_DIRECTORIES = [
     /node_modules/,
@@ -81,7 +83,20 @@ function startDevServer(directory, port) {
   }
 
   const localSandpackServer = (req, res) => {
-    if (req.url === '/') {
+    const filename = path.basename(req.url);
+    const ext = getExtension(filename);
+    const isSvg = ext === 'svg';
+
+    if (isSvg) {
+      const svgContent = sandboxFiles[req.url] && sandboxFiles[req.url].code;
+
+      res.setHeader('Content-Type', 'image/svg+xml');
+      res.write(svgContent);
+      res.end();
+
+      return;
+    }
+    else if (req.url === '/') {
       sendIndexHTML(res);
     } else if (req.url === '/index.js') {
       const clientJSPath = path.join(ROOT_DIR, 'lib', 'index.js');
@@ -123,9 +138,21 @@ function startDevServer(directory, port) {
     } else {
       const filename = path.basename(req.url);
       const ext = getExtension(filename);
-      const allowedExt = ['js', 'html', 'css', 'json'];
 
-      if (allowedExt.includes(ext)) {
+      // if it is an svg image send the svg content
+      if (ext === 'svg') {
+        const svgContent = sandboxFiles[req.url] && sandboxFiles[req.url].code;
+
+        res.setHeader('Content-Type', 'image/svg+xml');
+        res.write(svgContent);
+        res.end();
+
+        return;
+      }
+
+      const hostedSandboxAssetExtensions = ['js', 'html', 'css', 'json'];
+
+      if (hostedSandboxAssetExtensions.includes(ext)) {
         url = req.url;
       } else {
         url = '/index.html';
@@ -157,7 +184,7 @@ function startDevServer(directory, port) {
   const wsServer = new WebSocket.Server({ server: httpServer });
 
   wsServer.on('connection', (ws) => {
-    const sandboxFiles = getSandboxFiles(directory);
+    sandboxFiles = getSandboxFiles(directory);
 
     ws.send(JSON.stringify({
       type: WS_EVENTS.INIT,
