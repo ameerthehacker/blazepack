@@ -93,7 +93,7 @@ async function createSandboxFiles(sandboxInfo) {
   );
 
   /** 
-   * Create all directories, recursice: true; forces the directory creation if not present
+   * Create all directories, recursive: true; forces the directory creation if not present
    */
   Object.keys(directoriesWithPath).forEach(async (dir) => {
     await fs.mkdirSync(`${projectPath}/${directoriesWithPath[dir]}`, {
