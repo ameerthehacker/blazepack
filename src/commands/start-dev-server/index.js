@@ -8,14 +8,14 @@ const { WS_EVENTS } = require('../../constants');
 const chokidar = require('chokidar');
 const open = require('open');
 const {
-  isImage,
   readAsDataUrlSync,
   getPosixPath,
-  getExtension,
 } = require("./utils");
 const {
   logError,
-  logInfo
+  logInfo,
+  isImage,
+  getExtension
 } = require('../../utils');
 
 function startDevServer(directory, port) {
@@ -134,7 +134,7 @@ function startDevServer(directory, port) {
 
     const options = {
       hostname: 'www.unpkg.com',
-      path: `/blazepack-core@0.0.1/www/${url}`,
+      path: `/blazepack-core@0.0.2/www/${url}`,
       method: req.method
     };
 

@@ -2,6 +2,7 @@ const { red, blue, green } = require('chalk');
 const https = require("https");
 const fs = require("fs");
 const path = require("path");
+const Stream = require('stream').Transform;
 
 function logError(message) {
   console.log(red(message));
@@ -13,6 +14,19 @@ function logSuccess(message) {
 
 function logInfo(message) {
   console.log(blue(message));
+}
+
+function getExtension(filename) {
+  const fileParts = filename.split('.');
+
+  return fileParts[fileParts.length - 1];
+}
+
+function isImage(filename) {
+  const ext = getExtension(filename);
+  const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
+
+  return imageExtensions.includes(ext)
 }
 
 function getSandboxFiles(id) {
@@ -30,6 +44,29 @@ function getSandboxFiles(id) {
           });
         } else {
           reject(`failed to download sandbox for ${id}`);
+        }
+      })
+      .on("error", (e) => {
+        reject(e);
+      });
+  });
+}
+
+function downloadImage(url) {
+  return new Promise((resolve, reject) => {
+    https
+      .get(url, (response) => {
+        if (response.statusCode == 200) {
+          let data = new Stream();
+          response.on("data", (chunk) => {
+            data.push(chunk);
+          });
+
+          response.on("end", () => {
+            resolve(data.read());
+          });
+        } else {
+          reject(`failed to download image ${url}`);
         }
       })
       .on("error", (e) => {
@@ -118,6 +155,11 @@ async function createSandboxFiles(sandboxInfo, projectName) {
    * Create all files, with the code.
    */
   sandboxInfo.modules.forEach(async (module) => {
+    // if it is a image we need to download it from codesandbox locally
+    if (isImage(module.title)) {
+      module.code = await downloadImage(module.code);
+    }
+
     if (module.directory_shortid) {
       await fs.writeFileSync(
         `${projectPath}/${directoriesWithPath[module.directory_shortid]}${
@@ -137,4 +179,6 @@ module.exports = {
   logSuccess,
   getSandboxFiles,
   createSandboxFiles,
+  isImage,
+  getExtension
 };
