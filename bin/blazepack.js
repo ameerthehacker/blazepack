@@ -4,6 +4,7 @@ const createProject = require('../src/commands/create-project');
 const installPackage = require('../src/commands/install-package');
 const startDevServer = require('../src/commands/start-dev-server');
 const cloneSandbox = require('../src/commands/clone-sandbox');
+const removePackage = require("../src/commands/remove-package");
 const { version } = require('../package.json');
 const { logError, logInfo } = require('../src/utils');
 
@@ -65,10 +66,22 @@ if (args.version) {
       installPackage(package);
       break;
     }
+    case "remove": {
+      const package = args._[1];
+
+      if (!package) {
+        logError(`Required argument package name was not provided`);
+
+        process.exit(1);
+      }
+
+      removePackage(package);
+      break;
+    }
     case "create": {
       const projectName = args._[1];
       const template = args.template;
-      
+
       const templateId = validateNewProject(projectName, template);
 
       createProject({
