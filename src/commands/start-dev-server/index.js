@@ -134,7 +134,7 @@ function startDevServer(directory, port) {
 
     const options = {
       hostname: 'www.unpkg.com',
-      path: `/blazepack-core@0.0.1/www/${url}`,
+      path: `/blazepack-core@0.0.2/www/${url}`,
       method: req.method
     };
 
