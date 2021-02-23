@@ -8,14 +8,14 @@ const { WS_EVENTS } = require('../../constants');
 const chokidar = require('chokidar');
 const open = require('open');
 const {
-  isImage,
   readAsDataUrlSync,
   getPosixPath,
-  getExtension,
 } = require("./utils");
 const {
   logError,
-  logInfo
+  logInfo,
+  isImage,
+  getExtension
 } = require('../../utils');
 
 function startDevServer(directory, port) {
