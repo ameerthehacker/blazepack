@@ -5,7 +5,7 @@ const path = require('path');
 const WebSocket = require('ws');
 const { WS_EVENTS } = require('../../constants');
 const chokidar = require('chokidar');
-const open = require('open');
+const openBrowser = require('../../open-browser');
 const {
   logError,
   logInfo,
@@ -13,6 +13,7 @@ const {
   readSandboxFromFS,
   getPosixPath
 } = require('../../utils');
+const { blue, underline } = require('chalk');
 
 let sandboxFiles;
 
@@ -169,9 +170,10 @@ function startDevServer(directory, port) {
   httpServer.listen(port, () => {
     chokidar.watch(directory, { ignoreInitial: true })
       .on('ready', () => {
-        console.log(`⚡ Blazepack dev server running at http://localhost:${port}`);
+        const devServerURL = blue(underline(`http://localhost:${port}`));
 
-        open(`http://localhost:${port}`);
+        console.log(`⚡ Blazepack dev server running at ${devServerURL}`);
+        openBrowser(`http://localhost:${port}`);
       })
       .on('all', (event, filePath) => {
         const relativePath = `/${getPosixPath(path.relative(directory, filePath))}`;
