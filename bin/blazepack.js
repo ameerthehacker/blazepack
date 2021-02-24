@@ -108,8 +108,9 @@ if (args.version) {
     }
     case "export": {
       const directory = args._[1] || process.cwd();
+      const openInBrowser = args.open;
 
-      exportSandbox(directory);
+      exportSandbox({ directory, openInBrowser });
 
       break;
     }
