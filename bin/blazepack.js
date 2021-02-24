@@ -6,8 +6,14 @@ const startDevServer = require('../src/commands/start-dev-server');
 const cloneSandbox = require('../src/commands/clone-sandbox');
 const removePackage = require("../src/commands/remove-package");
 const exportSandbox = require("../src/commands/export-sandbox");
-const { version } = require('../package.json');
+const pkg = require('../package.json');
 const { logError, logInfo } = require('../src/utils');
+const updateNotifier = require('update-notifier');
+
+// Checking for available updates
+const notifier = updateNotifier({ pkg, isGlobal: true });
+// Show update notification
+notifier.notify();
 
 const args = parseArgs(process.argv.slice(2));
 const commandOrDirectory = args._[0] || process.cwd();
@@ -52,7 +58,7 @@ function validateNewProject(projectName, template) {
 }
 
 if (args.version) {
-  console.log(`v${version}`);
+  console.log(`v${pkg.version}`);
 } else {
   switch (commandOrDirectory) {
     case "add":
