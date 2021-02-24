@@ -2,35 +2,21 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
-const getAllFiles = require('get-all-files').default;
 const WebSocket = require('ws');
 const { WS_EVENTS } = require('../../constants');
 const chokidar = require('chokidar');
 const open = require('open');
 const {
-  readAsDataUrlSync,
-  getPosixPath,
-} = require("./utils");
-const {
   logError,
   logInfo,
-  isImage,
-  getExtension
+  getExtension,
+  readSandboxFromFS,
+  getPosixPath
 } = require('../../utils');
 
 let sandboxFiles;
 
 function startDevServer(directory, port) {
-  const IGNORED_DIRECTORIES = [
-    /node_modules/,
-    /.git/,
-    /.cache/
-  ];
-  const IGNORED_FILES = [
-    /yarn.lock/,
-    /package-lock.json/,
-    /.gitignore/
-  ]
   const ROOT_DIR = path.join(__dirname, '..', '..');
   const WWW_PATH = path.join(ROOT_DIR, 'client', 'www');
   const INDEX_HTML_PATH = path.join(WWW_PATH, 'index.html');
@@ -46,42 +32,7 @@ function startDevServer(directory, port) {
     res.write(indexHTMLContent);
     res.end();
   }
-  const getSandboxFiles = (directory) => {
-    let sandboxFiles = {};
-    // get all files in the dir except node modules
-    const filePaths = getAllFiles.sync.array(directory, {
-      resolve: true,
-      isExcludedDir: (dirname) => IGNORED_DIRECTORIES.find(excludedDir => excludedDir.test(dirname))
-    });
-
-
-    filePaths.forEach(filePath => {
-      // we don't want to read unnecessary huge files
-      const isExcludedFile = IGNORED_FILES.find(excludedFile => excludedFile.test(filePath));
-      const filename = path.basename(filePath);
-
-      if (isExcludedFile) return;
-
-      const relativePath = getPosixPath(path.relative(directory, filePath));
-      let fileContent;
-
-      if (isImage(filename)) {
-        fileContent = readAsDataUrlSync(filePath);
-      } else {
-        fileContent = fs.readFileSync(filePath, 'utf-8');
-      }
-
-      const sandboxFilePath = `/${relativePath}`;
-
-      sandboxFiles[sandboxFilePath] = {
-        code: fileContent,
-        path: sandboxFilePath
-      };
-    });
-
-    return sandboxFiles;
-  }
-
+ 
   const localSandpackServer = (req, res) => {
     const filename = path.basename(req.url);
     const ext = getExtension(filename);
@@ -184,7 +135,7 @@ function startDevServer(directory, port) {
   const wsServer = new WebSocket.Server({ server: httpServer });
 
   wsServer.on('connection', (ws) => {
-    sandboxFiles = getSandboxFiles(directory);
+    sandboxFiles = readSandboxFromFS(directory);
 
     ws.send(JSON.stringify({
       type: WS_EVENTS.INIT,
@@ -248,7 +199,7 @@ function startDevServer(directory, port) {
       if (err.errno === 'EADDRINUSE') {
         logError(`😢 Unable to start blazepack dev server, port ${port} is already in use`);
       } else {
-        logError(`😢 Unable to start blazepack dev server: ${err.message}`);
+        logError(`😢 Unexpected error occured in the dev server: ${err.message}`);
       }
     });
   }

@@ -5,6 +5,7 @@ const detectIndent = require("detect-indent");
 const fs = require("fs");
 const path = require("path");
 const Stream = require('stream').Transform;
+const getAllFiles = require('get-all-files').default;
 
 function logError(message) {
   console.log(red(message));
@@ -197,6 +198,68 @@ const getPackageJSON = () => {
     return null;
 }
 
+function getPosixPath(filePath) {
+  return filePath.split(path.sep).join(path.posix.sep);
+}
+
+function readAsDataUrlSync(filePath) {
+  const filename = path.basename(filePath);
+  const ext = getExtension(filename);
+  const fileContent = fs.readFileSync(filePath, 'base64');
+
+  return `data:image/${ext};base64,${fileContent}`;
+}
+
+function readSandboxFromFS (directory, exportFormat = false) {
+  const IGNORED_DIRECTORIES = [
+    /node_modules/,
+    /.git/,
+    /.cache/
+  ];
+  const IGNORED_FILES = [
+    /yarn.lock/,
+    /package-lock.json/,
+    /.gitignore/
+  ]
+  
+  let sandboxFiles = {};
+  // get all files in the dir except node modules
+  const filePaths = getAllFiles.sync.array(directory, {
+    resolve: true,
+    isExcludedDir: (dirname) => IGNORED_DIRECTORIES.find(excludedDir => excludedDir.test(dirname))
+  });
+
+
+  filePaths.forEach(filePath => {
+    // we don't want to read unnecessary huge files
+    const isExcludedFile = IGNORED_FILES.find(excludedFile => excludedFile.test(filePath));
+    const filename = path.basename(filePath);
+
+    if (isExcludedFile) return;
+
+    const relativePath = getPosixPath(path.relative(directory, filePath));
+    let fileContent;
+
+    if (isImage(filename)) {
+      fileContent = readAsDataUrlSync(filePath);
+    } else {
+      fileContent = fs.readFileSync(filePath, 'utf-8');
+    }
+
+    const sandboxFilePath = `/${relativePath}`;
+
+    // we use the export format in the export sandbox command
+    sandboxFiles[sandboxFilePath] = exportFormat? {
+      content: fileContent
+    }: {
+      code: fileContent,
+      path: sandboxFilePath
+    };
+  });
+
+  return sandboxFiles;
+}
+
 module.exports = {
   logError,
   logInfo,
@@ -206,4 +269,6 @@ module.exports = {
   isImage,
   getExtension,
   getPackageJSON,
+  readSandboxFromFS,
+  getPosixPath
 };

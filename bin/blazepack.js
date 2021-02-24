@@ -5,6 +5,7 @@ const installPackage = require('../src/commands/install-package');
 const startDevServer = require('../src/commands/start-dev-server');
 const cloneSandbox = require('../src/commands/clone-sandbox');
 const removePackage = require("../src/commands/remove-package");
+const exportSandbox = require("../src/commands/export-sandbox");
 const { version } = require('../package.json');
 const { logError, logInfo } = require('../src/utils');
 
@@ -102,6 +103,13 @@ if (args.version) {
       const templateId = validateNewProject(projectName, template);
 
       createProject({ projectName, templateId, startServer: true, port: PORT });
+
+      break;
+    }
+    case "export": {
+      const directory = args._[1] || process.cwd();
+
+      exportSandbox(directory);
 
       break;
     }
