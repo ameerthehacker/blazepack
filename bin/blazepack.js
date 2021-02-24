@@ -54,6 +54,7 @@ if (args.version) {
   console.log(`v${version}`);
 } else {
   switch (commandOrDirectory) {
+    case "add":
     case "install": {
       const package = args._[1];
 
@@ -66,6 +67,7 @@ if (args.version) {
       installPackage(package);
       break;
     }
+    case "uninstall":
     case "remove": {
       const package = args._[1];
 

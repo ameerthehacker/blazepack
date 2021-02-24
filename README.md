@@ -77,6 +77,23 @@ You can install a new package pretty fast using the below command. It does not c
 
 ```
 blazepack install redux
+
+# or 
+
+blazepack add redux
+```
+
+
+### Remove dependency
+
+You can quickly remove a unused dependency by running following command:
+
+```
+blazepack remove redux
+
+# or 
+
+blazepack uninstall redux
 ```
 
 ### Check version
