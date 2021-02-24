@@ -126,7 +126,7 @@ blazepack clone https://codesandbox.io/embed/use-undo-redo-yrts1
 blazepack clone use-undo-redo-yrts1
 ```
 
-### Export Sandbox
+### Export to [codesandbox.io](https://codesandbox.io)
 
 You can export your current project to codesandbox for sharing with your friends in a jiffy
 
