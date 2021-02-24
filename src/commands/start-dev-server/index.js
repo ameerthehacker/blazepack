@@ -13,6 +13,7 @@ const {
   readSandboxFromFS,
   getPosixPath
 } = require('../../utils');
+const { blue, underline } = require('chalk');
 
 let sandboxFiles;
 
@@ -169,8 +170,9 @@ function startDevServer(directory, port) {
   httpServer.listen(port, () => {
     chokidar.watch(directory, { ignoreInitial: true })
       .on('ready', () => {
-        console.log(`⚡ Blazepack dev server running at http://localhost:${port}`);
+        const devServerURL = blue(underline(`http://localhost:${port}`));
 
+        console.log(`⚡ Blazepack dev server running at ${devServerURL}`);
         open(`http://localhost:${port}`);
       })
       .on('all', (event, filePath) => {
