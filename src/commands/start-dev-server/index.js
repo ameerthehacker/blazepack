@@ -199,7 +199,7 @@ function startDevServer(directory, port) {
       if (err.errno === 'EADDRINUSE') {
         logError(`😢 Unable to start blazepack dev server, port ${port} is already in use`);
       } else {
-        logError(`😢 Unable to start blazepack dev server: ${err.message}`);
+        logError(`😢 Unexpected error occured in the dev server: ${err.message}`);
       }
     });
   }
