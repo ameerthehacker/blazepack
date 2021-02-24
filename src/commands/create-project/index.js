@@ -26,7 +26,7 @@ async function createProject({ projectName, templateId, startServer, port }) {
     logSuccess("✅ Project created");
     
     if (startServer) {
-      logInfo(`Starting project ${projectName}...`);
+      logInfo(`🚀 Starting project ${projectName}...`);
       startDevServer(projectPath, port);
     }
   } catch (err) {

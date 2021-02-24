@@ -269,5 +269,6 @@ module.exports = {
   isImage,
   getExtension,
   getPackageJSON,
-  readSandboxFromFS
+  readSandboxFromFS,
+  getPosixPath
 };

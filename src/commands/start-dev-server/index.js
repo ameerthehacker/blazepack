@@ -10,7 +10,8 @@ const {
   logError,
   logInfo,
   getExtension,
-  readSandboxFromFS
+  readSandboxFromFS,
+  getPosixPath
 } = require('../../utils');
 
 let sandboxFiles;
