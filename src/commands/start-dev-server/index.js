@@ -5,7 +5,7 @@ const path = require('path');
 const WebSocket = require('ws');
 const { WS_EVENTS } = require('../../constants');
 const chokidar = require('chokidar');
-const open = require('open');
+const openBrowser = require('../../open-browser');
 const {
   logError,
   logInfo,
@@ -173,7 +173,7 @@ function startDevServer(directory, port) {
         const devServerURL = blue(underline(`http://localhost:${port}`));
 
         console.log(`⚡ Blazepack dev server running at ${devServerURL}`);
-        open(`http://localhost:${port}`);
+        openBrowser(`http://localhost:${port}`);
       })
       .on('all', (event, filePath) => {
         const relativePath = `/${getPosixPath(path.relative(directory, filePath))}`;
