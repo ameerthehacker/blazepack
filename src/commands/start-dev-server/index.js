@@ -98,6 +98,8 @@ function startDevServer(directory, port) {
      */
     if (req.url === '/') {
       url = "/index.html";
+    } else {
+      url = req.url;
     }
 
     if (req.url === '/' || hostedSandboxAssetExtensions.includes(ext)) {
@@ -108,7 +110,7 @@ function startDevServer(directory, port) {
        */
       const options = {
         hostname: "www.unpkg.com",
-        path: `/blazepack-core@0.0.2/www/${url}`,
+        path: `/blazepack-core@0.0.2/www${url}`,
         method: req.method,
       };
 
@@ -120,7 +122,11 @@ function startDevServer(directory, port) {
         });
 
         proxyRes.on("end", function () {
-          res.writeHead(proxyRes.statusCode, proxyRes.headers);
+          const statusCode = proxyRes.statusCode;
+          const shouldCache = statusCode === 200 && url !== '/index.html';
+          const headers = shouldCache? proxyRes.headers: {...proxyRes.headers, 'cache-control': 'no-cache'};
+
+          res.writeHead(statusCode, headers);
           res.end(body);
         });
       });
@@ -136,9 +142,16 @@ function startDevServer(directory, port) {
       }
 
       res.setHeader("Content-Type", mimeType || "text/plain");
-      const assetContent = fs.readFileSync(`${process.cwd()}${req.url}`, "utf-8");
 
-      res.write(assetContent);
+      const assetPath = path.join(process.cwd(), req.url);
+
+      if (fs.existsSync(assetPath)) {
+        const assetContent = fs.readFileSync(assetPath);
+        res.write(assetContent);
+      } else {
+        res.setHeader("Status-Code", 404);
+      }
+
       res.end();
     }
   };
