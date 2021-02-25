@@ -51,7 +51,7 @@ blazepack start my-angular-app --template=angular
 
 <details>
   <summary>
-    <h4>Available Templates</h4>
+    Available Templates
   </summary>
   <ul>
     <li>static</li>
