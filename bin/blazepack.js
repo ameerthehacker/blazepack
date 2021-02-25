@@ -11,9 +11,9 @@ const { logError, logInfo } = require('../src/utils');
 const updateNotifier = require('update-notifier');
 
 // Checking for available updates
-const notifier = updateNotifier({ pkg, isGlobal: true });
+const notifier = updateNotifier({ pkg });
 // Show update notification
-notifier.notify();
+notifier.notify({ isGlobal: true });
 
 const args = parseArgs(process.argv.slice(2));
 const commandOrDirectory = args._[0] || process.cwd();
