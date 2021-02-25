@@ -3,7 +3,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const WebSocket = require('ws');
-const { WS_EVENTS } = require('../../constants');
+const { WS_EVENTS, MIME_TYPES } = require('../../constants');
 const chokidar = require('chokidar');
 const openBrowser = require('../../open-browser');
 const {
@@ -71,14 +71,12 @@ function startDevServer(directory, port) {
     }
   };
 
-  // we have our own sandpack hosted in unpkg for flexibility
-  // we proxy all requests except /index.js file
-  const selfHostedSandpackServer = (req, res) => {
-    let url;
 
-    if (req.url === '/') {
-      url = '/index.html';
-    } else if (req.url === '/index.js') {
+  const selfHostedSandpackServer = (req, res) => {
+    /**
+     * Serve client/index.js for updating on websockets events.
+     */
+    if (req.url === '/index.js') {
       const clientJSPath = path.join(ROOT_DIR, 'lib', 'index.js');
       const assetContent = fs.readFileSync(clientJSPath, 'utf-8');
 
@@ -87,49 +85,62 @@ function startDevServer(directory, port) {
       res.end();
 
       return;
-    } else {
-      const filename = path.basename(req.url);
-      const ext = getExtension(filename);
+    } 
 
-      // if it is an svg image send the svg content
-      if (ext === 'svg') {
-        const svgContent = sandboxFiles[req.url] && sandboxFiles[req.url].code;
+    let url;
+    const hostedSandboxAssetExtensions = ["js", "html", "css", "json", "map"];
 
-        res.setHeader('Content-Type', 'image/svg+xml');
-        res.write(svgContent);
-        res.end();
+    const filename = path.basename(req.url);
+    const ext = getExtension(filename);
 
-        return;
-      }
-
-      const hostedSandboxAssetExtensions = ['js', 'html', 'css', 'json'];
-
-      if (hostedSandboxAssetExtensions.includes(ext)) {
-        url = req.url;
-      } else {
-        url = '/index.html';
-      }
+    /**
+     * Serve index.html, on root url.
+     */
+    if (req.url === '/') {
+      url = "/index.html";
     }
 
-    const options = {
-      hostname: 'www.unpkg.com',
-      path: `/blazepack-core@0.0.2/www/${url}`,
-      method: req.method
-    };
+    if (req.url === '/' || hostedSandboxAssetExtensions.includes(ext)) {
+      /**
+       * Proxy all requests which access sandpack assets.
+       * We host our bundler with unpkg, which will cache all deps
+       * and bundling files.
+       */
+      const options = {
+        hostname: "www.unpkg.com",
+        path: `/blazepack-core@0.0.2/www/${url}`,
+        method: req.method,
+      };
 
-    const proxyReq = https.request(options, function (proxyRes) {
-      let body = '';
+      const proxyReq = https.request(options, function (proxyRes) {
+        let body = "";
 
-      proxyRes.on('data', function (chunk) {
-        body += chunk;
+        proxyRes.on("data", function (chunk) {
+          body += chunk;
+        });
+
+        proxyRes.on("end", function () {
+          res.writeHead(proxyRes.statusCode, proxyRes.headers);
+          res.end(body);
+        });
       });
+      proxyReq.end();
+    } else {
+      /** 
+       * This will work for svgs, or any other assets not hosted by sandpack.
+       */
+      const mimeType =  MIME_TYPES[ext];
 
-      proxyRes.on('end', function () {
-        res.writeHead(proxyRes.statusCode, proxyRes.headers);
-        res.end(body);
-      });
-    });
-    proxyReq.end();
+      if (!mimeType) {
+        logError("We don't support this file extension. Please create an issue to add the support for the file.");
+      }
+
+      res.setHeader("Content-Type", mimeType || "text/plain");
+      const assetContent = fs.readFileSync(`${process.cwd()}${req.url}`, "utf-8");
+
+      res.write(assetContent);
+      res.end();
+    }
   };
 
   const httpServer = http.createServer(isSandpackAvailableLocally ? localSandpackServer : selfHostedSandpackServer);
