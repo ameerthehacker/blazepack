@@ -2,9 +2,8 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
-const mime = require("mime/lite");
 const WebSocket = require('ws');
-const { WS_EVENTS } = require('../../constants');
+const { WS_EVENTS, MIME_TYPES } = require('../../constants');
 const chokidar = require('chokidar');
 const openBrowser = require('../../open-browser');
 const {
@@ -130,7 +129,13 @@ function startDevServer(directory, port) {
       /** 
        * This will work for svgs, or any other assets not hosted by sandpack.
        */
-      res.setHeader("Content-Type", mime.getType(req.url));
+      const mimeType =  MIME_TYPES[ext];
+
+      if (!mimeType) {
+        logError("We don't support this file extension. Please create an issue to add the support for the file.");
+      }
+
+      res.setHeader("Content-Type", mimeType || "text/plain");
       const assetContent = fs.readFileSync(`${process.cwd()}${req.url}`, "utf-8");
 
       res.write(assetContent);
