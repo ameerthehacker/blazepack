@@ -8,7 +8,9 @@ const removePackage = require("../src/commands/remove-package");
 const exportSandbox = require("../src/commands/export-sandbox");
 const pkg = require('../package.json');
 const { logError, logInfo } = require('../src/utils');
+const { blue, underline } = require('chalk');
 const updateNotifier = require('update-notifier');
+const cliSelect = require('cli-select');
 
 // Checking for available updates
 const notifier = updateNotifier({ pkg });
@@ -19,22 +21,21 @@ const args = parseArgs(process.argv.slice(2));
 const commandOrDirectory = args._[0] || process.cwd();
 const DEFAULT_PORT = 3000;
 const PORT = args.port || DEFAULT_PORT;
+const TEMPLATES = {
+  static: "github/codesandbox-app/static-template/tree/master",
+  react: "new",
+  vanilla: "vanilla",
+  preact: "preact",
+  vue2: "vue",
+  vue3: "vue-3",
+  angular: "angular",
+  svelte: "svelte",
+  reason: "reason-reason",
+  cxjs: "github/codaxy/cxjs-codesandbox-template/tree/master"
+};
 
 function validateNewProject(projectName, template) {
-  const officialTemplates = {
-    static: "github/codesandbox-app/static-template/tree/master",
-    react: "new",
-    vanilla: "vanilla",
-    preact: "preact",
-    vue2: "vue",
-    vue3: "vue-3",
-    angular: "angular",
-    svelte: "svelte",
-    reason: "reason-reason",
-    cxjs: "github/codaxy/cxjs-codesandbox-template/tree/master"
-  };
-
-  const availableTemplates = Object.keys(officialTemplates).join(", ");
+  const availableTemplates = Object.keys(TEMPLATES).join(", ");
 
   if (!projectName) {
     logError(`Required argument project name was not provided`);
@@ -42,14 +43,7 @@ function validateNewProject(projectName, template) {
     process.exit(1);
   }
 
-  if (!template) {
-    logInfo('No template was provided using the default template react');
-
-    template = 'react';
-  }
-
-
-  if (!officialTemplates[template]) {
+  if (template && !TEMPLATES[template]) {
     logError(
       `Unknown template ${template}, available options are ${availableTemplates}`
     );
@@ -57,7 +51,31 @@ function validateNewProject(projectName, template) {
     process.exit(1);
   }
 
-  return officialTemplates[template];
+  return new Promise((resolve) => {
+    if (!template) {
+      logInfo('What template you want to use?');
+
+      cliSelect({
+        values: Object.keys(TEMPLATES),
+        cleanup: true,
+        selected: '👉',
+        unselected: '  ',
+        valueRenderer: (value, selected) => {
+          if (selected) {
+              return blue(underline(value));
+          }
+   
+          return value;
+        },
+      }).then(answer => {
+        logInfo(`🔨 Creating ${answer.value} based project...`);
+
+        resolve(TEMPLATES[answer.value])
+      }).catch(() => resolve(null));
+    } else {
+      resolve(TEMPLATES[template]);
+    }
+  });
 }
 
 if (args.version) {
@@ -94,24 +112,33 @@ if (args.version) {
       const projectName = args._[1];
       const template = args.template;
 
-      const templateId = validateNewProject(projectName, template);
-
-      createProject({
-        projectName,
-        templateId,
-        startServer: false,
-        port: PORT,
+      validateNewProject(projectName, template).then(templateId => {
+        if (templateId) {
+          createProject({
+            projectName,
+            templateId,
+            startServer: false,
+            port: PORT,
+          });
+        }
       });
-
+ 
       break;
     }
     case "start": {
       const projectName = args._[1];
       const template = args.template;
 
-      const templateId = validateNewProject(projectName, template);
-
-      createProject({ projectName, templateId, startServer: true, port: PORT });
+      validateNewProject(projectName, template).then(templateId => {
+        if (templateId) {
+          createProject({
+            projectName,
+            templateId,
+            startServer: true,
+            port: PORT,
+          });
+        }
+      });
 
       break;
     }
