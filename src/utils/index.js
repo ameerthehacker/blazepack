@@ -96,7 +96,8 @@ async function createSandboxFiles(sandboxInfo, projectName) {
    *
    */
   // create an empty dir for our project
-  fs.mkdirSync(projectName);
+  const projectDir = projectName || sandboxInfo.title || sandboxInfo.id;
+  if (projectDir) fs.mkdirSync(projectName || sandboxInfo.title || sandboxInfo.id);
 
   const directories = sandboxInfo.directories.reduce(
     (agg, directory) => ({
@@ -145,7 +146,7 @@ async function createSandboxFiles(sandboxInfo, projectName) {
    */
   const projectPath = path.join(
     process.cwd(),
-    projectName || sandboxInfo.title || sandboxInfo.id
+    projectDir
   );
 
   /**

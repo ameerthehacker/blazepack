@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 const parseArgs = require('minimist');
+const { blue, underline } = require('chalk');
+const updateNotifier = require('update-notifier');
+const cliSelect = require('cli-select');
+const path = require('path');
+const fs = require('fs');
 const createProject = require('../src/commands/create-project');
 const installPackage = require('../src/commands/install-package');
 const startDevServer = require('../src/commands/start-dev-server');
@@ -8,9 +13,6 @@ const removePackage = require("../src/commands/remove-package");
 const exportSandbox = require("../src/commands/export-sandbox");
 const pkg = require('../package.json');
 const { logError, logInfo } = require('../src/utils');
-const { blue, underline } = require('chalk');
-const updateNotifier = require('update-notifier');
-const cliSelect = require('cli-select');
 
 // Checking for available updates
 const notifier = updateNotifier({ pkg });
@@ -38,6 +40,14 @@ const TEMPLATES = {
 };
 
 function validateNewProject(projectName, template) {
+  const projectPath = path.join(process.cwd(), projectName);
+
+  if (fs.existsSync(projectPath)) {
+    logError(`😢 Sorry a directory with name ${projectName} already exists!`);
+
+    process.exit(1);
+  }
+
   const availableTemplates = Object.keys(TEMPLATES).join(", ");
 
   if (!projectName) {

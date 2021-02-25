@@ -71,7 +71,6 @@ function startDevServer(directory, port) {
     }
   };
 
-
   const selfHostedSandpackServer = (req, res) => {
     /**
      * Serve client/index.js for updating on websockets events.

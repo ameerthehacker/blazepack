@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const {
   logInfo,
   logError,
@@ -8,16 +6,11 @@ const {
   createSandboxFiles,
 } = require("../../utils");
 const startDevServer = require('../start-dev-server');
+const path = require('path');
 
 async function createProject({ projectName, templateId, startServer, port }) {
   try {
     const projectPath = path.join(process.cwd(), projectName);
-
-    if (fs.existsSync(projectPath)) {
-      logError(`😢 Sorry a directory with name ${projectName} already exists!`);
-
-      process.exit(1);
-    }
 
     logInfo(`📥 Downloading template...`); 
     const res = await getSandboxFiles(templateId);
