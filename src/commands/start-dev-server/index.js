@@ -95,14 +95,15 @@ function startDevServer(directory, port) {
 
     /**
      * Serve index.html, on root url.
+     * if / is requested or if the resource does not have an extension always return index.html
      */
-    if (req.url === '/') {
+    if (req.url === '/' || !ext) {
       url = "/index.html";
     } else {
       url = req.url;
     }
 
-    if (req.url === '/' || hostedSandboxAssetExtensions.includes(ext)) {
+    if (url === '/index.html' || hostedSandboxAssetExtensions.includes(ext)) {
       /**
        * Proxy all requests which access sandpack assets.
        * We host our bundler with unpkg, which will cache all deps
@@ -143,13 +144,13 @@ function startDevServer(directory, port) {
 
       res.setHeader("Content-Type", mimeType || "text/plain");
 
-      const assetPath = path.join(process.cwd(), req.url);
+      const assetPath = path.join(directory, req.url);
 
       if (fs.existsSync(assetPath)) {
         const assetContent = fs.readFileSync(assetPath);
         res.write(assetContent);
       } else {
-        res.setHeader("Status-Code", 404);
+        res.writeHead(404);
       }
 
       res.end();

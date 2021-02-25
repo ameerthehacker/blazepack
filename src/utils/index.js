@@ -22,7 +22,7 @@ function logInfo(message) {
 function getExtension(filename) {
   const fileParts = filename.split('.');
 
-  return fileParts[fileParts.length - 1];
+  return fileParts.length > 1? fileParts[fileParts.length - 1]: null;
 }
 
 function isImage(filename) {

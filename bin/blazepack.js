@@ -29,6 +29,8 @@ function validateNewProject(projectName, template) {
     vue3: "vue-3",
     angular: "angular",
     svelte: "svelte",
+    reason: "reason-reason",
+    cxjs: "github/codaxy/cxjs-codesandbox-template/tree/master"
   };
 
   const availableTemplates = Object.keys(officialTemplates).join(", ");
