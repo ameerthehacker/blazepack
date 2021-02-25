@@ -23,7 +23,7 @@ I always wanted the super fast feedback that codesandbox provides in my local en
 * Super tiny (24kb) 👌
 * Run projects without npm install 💃
 * React fast refresh ❤️
-* Supports React, Vue 2, Vue 3, Angular, Preact, Svelte 🔨
+* Supports React, Vue, Angular, Preact, Svelte and more 🔨
 * Save disk space 💾
 
 ## Install
@@ -45,7 +45,20 @@ Create your first **create react app**
 blazepack create my-cra --template=react
 ```
 
-The available template options are **react, angular, vue2, vue3, preact and svelte**. You can use the below command to create the app and also start the dev server immediately
+The available template options are. 
+
+* static
+* react
+* vanilla
+* preact
+* vue2
+* vue3
+* angular
+* svelte
+* reason
+* cxjs
+
+You can use the below command to create the app and also start the dev server immediately
 
 ```
 blazepack start my-angular-app --template=angular
