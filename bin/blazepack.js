@@ -22,6 +22,7 @@ const PORT = args.port || DEFAULT_PORT;
 
 function validateNewProject(projectName, template) {
   const officialTemplates = {
+    static: "github/codesandbox-app/static-template/tree/master",
     react: "new",
     vanilla: "vanilla",
     preact: "preact",

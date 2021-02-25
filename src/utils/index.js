@@ -95,6 +95,9 @@ async function createSandboxFiles(sandboxInfo, projectName) {
    * }
    *
    */
+  // create an empty dir for our project
+  fs.mkdirSync(projectName);
+
   const directories = sandboxInfo.directories.reduce(
     (agg, directory) => ({
       ...agg,
@@ -148,8 +151,8 @@ async function createSandboxFiles(sandboxInfo, projectName) {
   /**
    * Create all directories, recursive: true; forces the directory creation if not present
    */
-  Object.keys(directoriesWithPath).forEach(async (dir) => {
-    await fs.mkdirSync(`${projectPath}/${directoriesWithPath[dir]}`, {
+  Object.keys(directoriesWithPath).forEach((dir) => {
+    fs.mkdirSync(`${projectPath}/${directoriesWithPath[dir]}`, {
       recursive: true,
     });
   });
