@@ -75,6 +75,7 @@ function startDevServer(directory, port) {
   // we proxy all requests except /index.js file
   const selfHostedSandpackServer = (req, res) => {
     let url;
+    const hostedSandboxAssetExtensions = ["js", "html", "css", "json"];
 
     if (req.url === '/') {
       url = '/index.html';
@@ -87,28 +88,26 @@ function startDevServer(directory, port) {
       res.end();
 
       return;
+    } 
+
+    const filename = path.basename(req.url);
+    const ext = getExtension(filename);
+
+    // if it is an svg image send the svg content
+    if (ext === 'svg') {
+      const svgContent = sandboxFiles[req.url] && sandboxFiles[req.url].code;
+
+      res.setHeader('Content-Type', 'image/svg+xml');
+      res.write(svgContent);
+      res.end();
+
+      return;
+    }
+
+    if (hostedSandboxAssetExtensions.includes(ext)) {
+      url = req.url;
     } else {
-      const filename = path.basename(req.url);
-      const ext = getExtension(filename);
-
-      // if it is an svg image send the svg content
-      if (ext === 'svg') {
-        const svgContent = sandboxFiles[req.url] && sandboxFiles[req.url].code;
-
-        res.setHeader('Content-Type', 'image/svg+xml');
-        res.write(svgContent);
-        res.end();
-
-        return;
-      }
-
-      const hostedSandboxAssetExtensions = ['js', 'html', 'css', 'json'];
-
-      if (hostedSandboxAssetExtensions.includes(ext)) {
-        url = req.url;
-      } else {
-        url = '/index.html';
-      }
+      url = '/index.html';
     }
 
     const options = {
@@ -124,8 +123,16 @@ function startDevServer(directory, port) {
         body += chunk;
       });
 
+      /** Only cache sandpack related files - Deps, bundler files */
+      const proxyHeaders = {
+        ...proxyRes.headers,
+        ...(hostedSandboxAssetExtensions.includes(ext) ? {} : {
+          'cache-control': 'no-cache',
+        }),
+      };
+
       proxyRes.on('end', function () {
-        res.writeHead(proxyRes.statusCode, proxyRes.headers);
+        res.writeHead(proxyRes.statusCode, proxyHeaders);
         res.end(body);
       });
     });
