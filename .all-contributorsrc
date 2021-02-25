@@ -52,7 +52,18 @@
         "doc",
         "ideas"
       ]
+    },
+    {
+      "login": "dhruwlalan",
+      "name": "dhruw lalan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/64348100?v=4",
+      "profile": "https://dhruwlalan.github.io/",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
-  "contributorsPerLine": 7
+  "contributorsPerLine": 7,
+  "skipCi": true
 }
