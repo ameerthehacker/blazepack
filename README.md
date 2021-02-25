@@ -43,26 +43,32 @@ Create your first **create react app**
 
 ```
 blazepack create my-cra --template=react
-```
 
-The available template options are. 
+# create the app and also start the dev server
 
-* static
-* react
-* vanilla
-* preact
-* vue2
-* vue3
-* angular
-* svelte
-* reason
-* cxjs
-
-You can use the below command to create the app and also start the dev server immediately
-
-```
 blazepack start my-angular-app --template=angular
 ```
+
+<details>
+  <summary>
+    <h4>Available Templates</h4>
+  </summary>
+  <ul>
+    <li>static</li>
+    <li>react</li>
+    <li>react-ts</li>
+    <li>react-native-web</li>
+    <li>vanilla</li>
+    <li>preact</li>
+    <li>vue2</li>
+    <li>vue3</li>
+    <li>angular</li>
+    <li>svelte</li>
+    <li>reason</li>
+    <li>cxjs</li>
+    <li>dojo</li>
+  </ul>
+</details>
 
 ### Start project
 

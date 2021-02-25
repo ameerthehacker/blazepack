@@ -14,7 +14,7 @@ async function createProject({ projectName, templateId, startServer, port }) {
     const projectPath = path.join(process.cwd(), projectName);
 
     if (fs.existsSync(projectPath)) {
-      logError(`Sorry a directory with name ${projectName} already exists!`);
+      logError(`😢 Sorry a directory with name ${projectName} already exists!`);
 
       process.exit(1);
     }
@@ -30,7 +30,7 @@ async function createProject({ projectName, templateId, startServer, port }) {
       startDevServer(projectPath, port);
     }
   } catch (err) {
-    logError(`Unable to create new project: ${err}`);
+    logError(`😢 Unable to create new project: ${err}`);
   }
 }
 

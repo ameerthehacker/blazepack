@@ -24,6 +24,8 @@ const PORT = args.port || DEFAULT_PORT;
 const TEMPLATES = {
   static: "github/codesandbox-app/static-template/tree/master",
   react: "new",
+  "react-ts": "react-typescript-react-ts",
+  "react-native-web": "react-native-q4qymyp2l6",
   vanilla: "vanilla",
   preact: "preact",
   vue2: "vue",
@@ -31,6 +33,7 @@ const TEMPLATES = {
   angular: "angular",
   svelte: "svelte",
   reason: "reason-reason",
+  dojo: "github/dojo/dojo-codesandbox-template/tree/master",
   cxjs: "github/codaxy/cxjs-codesandbox-template/tree/master"
 };
 
