@@ -50,4 +50,20 @@ const MIME_TYPES = {
   md: "text/markdown",
 };
 
-module.exports = { WS_EVENTS, MIME_TYPES };
+const TEMPLATES = [
+  'static',
+  'react',
+  'react-ts',
+  'react-native-web',
+  'vanilla',
+  'preact',
+  'vue2',
+  'vue3',
+  'angular',
+  'svelte',
+  'reason',
+  'cxjs',
+  'dojo',
+]
+
+module.exports = { WS_EVENTS, MIME_TYPES, TEMPLATES };

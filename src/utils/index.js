@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const Stream = require('stream').Transform;
 const getAllFiles = require('get-all-files').default;
+const { TEMPLATES } = require('../constants');
 
 function logError(message) {
   console.log(red(message));
@@ -20,8 +21,7 @@ function logInfo(message) {
 }
 
 function logHelp(command) {
-  if (!command) {
-    console.log(`
+  const mainHelp = `
 Usage:
   blazepack   Start dev server on existing project
   blazepack   [options]  [command]
@@ -40,7 +40,9 @@ Commands:
   uninstall       Remove dependency
   remove          Remove dependency (alias for uninstall)
   help [command]  show help for a particular command
-`);
+`;
+  if (!command) {
+    console.log(mainHelp);
   } else {
     switch (command) {
       case 'create':
@@ -53,21 +55,10 @@ list of available templates to select from.
 
 eg: blazepack create my-cra --template=react
 
-List of available templates are:
-  1. static
-  2. react
-  3. react-ts
-  4. react-native-web
-  5. vanilla
-  6. preact
-  7. vue2
-  8. vue3
-  9. angular
- 10. svelte
- 11. reason
- 12. cxjs
- 13. dojo
-`);
+List of available templates are:`);
+        TEMPLATES.forEach(template => {
+          console.log(`  ${template}`);
+        });
         break;
       case 'start':
         console.log(`
@@ -78,21 +69,10 @@ If the --template option is not specified you will get the list of available tem
 
 eg: blazepack start my-angular-app --template=angular
 
-List of available templates are:
-  1. static
-  2. react
-  3. react-ts
-  4. react-native-web
-  5. vanilla
-  6. preact
-  7. vue2
-  8. vue3
-  9. angular
- 10. svelte
- 11. reason
- 12. cxjs
- 13. dojo
-`);
+List of available templates are:`);
+        TEMPLATES.forEach(template => {
+          console.log(`  ${template}`);
+        });
         break;
       case 'clone':
         console.log(`
@@ -104,7 +84,7 @@ You can clone using a url or embed-url or sandbox-id.
 eg: Clone from URL:
 blazepack clone https://codesandbox.io/s/use-undo-redo-yrts1
 
-eg: Cloning from embed url:
+eg: Cloning from Embed URL:
 blazepack clone https://codesandbox.io/embed/use-undo-redo-yrts1
 
 eg: Clone from Sandbox Id:
@@ -156,7 +136,7 @@ blazepack remove redux
         break;
       default:
         console.log(`Error: unknown command '${command}'`);
-        console.log('\nAvailable commands:\n  create, start, clone, export, install, add, uninstall, remove');
+        console.log(mainHelp);
         break;
     }
   }

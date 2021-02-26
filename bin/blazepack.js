@@ -198,10 +198,6 @@ if (args.version) {
     }
     case "help": {
       const command = args._[1];
-      if (!command) {
-        logHelp();
-        break;
-      }
       logHelp(command);
       break;
     }
