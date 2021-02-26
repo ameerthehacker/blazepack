@@ -33,13 +33,13 @@ Options:
 Commands:
   create          Create project from Template
   start           Create project from Template & Start the dev server
-  clone           clone an existing codesandox
+  clone           Clone an existing codesandbox
   export          Export to codesandbox.io
   install         Install dependency
   add             Install dependency (alias for install)
   uninstall       Remove dependency
   remove          Remove dependency (alias for uninstall)
-  help [command]  show help for a particular command
+  help [command]  Show help for a particular command
 `;
   if (!command) {
     console.log(mainHelp);
@@ -78,7 +78,7 @@ List of available templates are:`);
         console.log(`
 Usage: blazepack clone <url | embed-url | sandbox-id>
 
-Clone an existing codesandox.
+Clone an existing codesandbox.
 You can clone using a url or embed-url or sandbox-id.  
 
 eg: Clone from URL:
@@ -120,7 +120,7 @@ blazepack add redux
       case 'uninstall':
         console.log(`\nUsage: blazepack uninstall <package>`);
       case 'remove':
-        if (command === 'add') {
+        if (command === 'remove') {
           console.log(`\nUsage: blazepack remove <package>`);
         }
         console.log(`
