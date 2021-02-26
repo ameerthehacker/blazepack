@@ -157,6 +157,18 @@ blazepack export
 blazepack export --open
 ```
 
+### Help
+
+You can know more about the available commands and their options using the help command
+
+```
+blazepack help
+
+# get help on individual command
+
+blazepack help start
+```
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
