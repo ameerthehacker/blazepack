@@ -19,6 +19,149 @@ function logInfo(message) {
   console.log(blue(message));
 }
 
+function logHelp(command) {
+  if (!command) {
+    console.log(`
+Usage:
+  blazepack   Start dev server on existing project
+  blazepack   [options]  [command]
+
+Options:
+  --version   Output the current version
+  --port <p>  Specify port <p> for dev server
+
+Commands:
+  create          Create project from Template
+  start           Create project from Template & Start the dev server
+  clone           clone an existing codesandox
+  export          Export to codesandbox.io
+  install         Install dependency
+  add             Install dependency (alias for install)
+  uninstall       Remove dependency
+  remove          Remove dependency (alias for uninstall)
+  help [command]  show help for a particular command
+`);
+  } else {
+    switch (command) {
+      case 'create':
+        console.log(`
+Usage: blazepack create <name> [--template=<template>]
+        
+Create project with name <name> from Template <template>.
+If the --template option is not specified you will get the
+list of available templates to select from. 
+
+eg: blazepack create my-cra --template=react
+
+List of available templates are:
+  1. static
+  2. react
+  3. react-ts
+  4. react-native-web
+  5. vanilla
+  6. preact
+  7. vue2
+  8. vue3
+  9. angular
+ 10. svelte
+ 11. reason
+ 12. cxjs
+ 13. dojo
+`);
+        break;
+      case 'start':
+        console.log(`
+Usage: blazepack start <name> [--template=<template>]
+        
+Create project with name <name> from Template <template> & also start the dev server.
+If the --template option is not specified you will get the list of available templates to select from. 
+
+eg: blazepack start my-angular-app --template=angular
+
+List of available templates are:
+  1. static
+  2. react
+  3. react-ts
+  4. react-native-web
+  5. vanilla
+  6. preact
+  7. vue2
+  8. vue3
+  9. angular
+ 10. svelte
+ 11. reason
+ 12. cxjs
+ 13. dojo
+`);
+        break;
+      case 'clone':
+        console.log(`
+Usage: blazepack clone <url | embed-url | sandbox-id>
+
+Clone an existing codesandox.
+You can clone using a url or embed-url or sandbox-id.  
+
+eg: Clone from URL:
+blazepack clone https://codesandbox.io/s/use-undo-redo-yrts1
+
+eg: Cloning from embed url:
+blazepack clone https://codesandbox.io/embed/use-undo-redo-yrts1
+
+eg: Clone from Sandbox Id:
+blazepack clone use-undo-redo-yrts1
+`);
+        break;
+      case 'export':
+        console.log(`
+Usage: blazepack export [--open]
+
+Export your current project to codesandbox.io & also open the newly
+created sandbox in a browser tab if the --open option is specified.
+`);
+        break;
+      case 'install':
+        console.log(`\nUsage: blazepack install <package>`);
+      case 'add':
+        if (command === 'add') {
+          console.log(`\nUsage: blazepack add <package>`);
+        }
+        console.log(`
+Quickly Install a new package (dependency).
+It does not create node_modules so you are gonna save a lot of space.
+The install & add command are both similar.
+
+eg: blazepack install redux
+
+# or
+
+blazepack add redux
+`);
+        break;
+      case 'uninstall':
+        console.log(`\nUsage: blazepack uninstall <package>`);
+      case 'remove':
+        if (command === 'add') {
+          console.log(`\nUsage: blazepack remove <package>`);
+        }
+        console.log(`
+Quickly Remove an unused package (dependency).
+The uninstall & remove command are both similar.
+
+eg: blazepack uninstall redux
+
+# or
+
+blazepack remove redux
+`);
+        break;
+      default:
+        console.log(`Error: unknown command '${command}'`);
+        console.log('\nAvailable commands:\n  create, start, clone, export, install, add, uninstall, remove');
+        break;
+    }
+  }
+}
+
 function getExtension(filename) {
   const fileParts = filename.split('.');
 
@@ -268,6 +411,7 @@ module.exports = {
   logError,
   logInfo,
   logSuccess,
+  logHelp,
   getSandboxFiles,
   createSandboxFiles,
   isImage,

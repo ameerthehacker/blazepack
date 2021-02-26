@@ -12,7 +12,7 @@ const cloneSandbox = require('../src/commands/clone-sandbox');
 const removePackage = require("../src/commands/remove-package");
 const exportSandbox = require("../src/commands/export-sandbox");
 const pkg = require('../package.json');
-const { logError, logInfo } = require('../src/utils');
+const { logError, logInfo, logHelp } = require('../src/utils');
 
 // Checking for available updates
 const notifier = updateNotifier({ pkg });
@@ -194,6 +194,15 @@ if (args.version) {
       }
 
       cloneSandbox({ id: sandboxId });
+      break;
+    }
+    case "help": {
+      const command = args._[1];
+      if (!command) {
+        logHelp();
+        break;
+      }
+      logHelp(command);
       break;
     }
     default: {
