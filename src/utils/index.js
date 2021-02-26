@@ -56,7 +56,7 @@ list of available templates to select from.
 eg: blazepack create my-cra --template=react
 
 List of available templates are:`);
-        TEMPLATES.forEach(template => {
+        Object.keys(TEMPLATES).forEach(template => {
           console.log(`  ${template}`);
         });
         break;
@@ -70,7 +70,7 @@ If the --template option is not specified you will get the list of available tem
 eg: blazepack start my-angular-app --template=angular
 
 List of available templates are:`);
-        TEMPLATES.forEach(template => {
+        Object.keys(TEMPLATES).forEach(template => {
           console.log(`  ${template}`);
         });
         break;
