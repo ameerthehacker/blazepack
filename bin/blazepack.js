@@ -23,6 +23,7 @@ const args = parseArgs(process.argv.slice(2));
 const commandOrDirectory = args._[0] || process.cwd();
 const DEFAULT_PORT = 3000;
 const PORT = args.port || DEFAULT_PORT;
+const BROWSER = args.browser || '';
 const TEMPLATES = {
   static: "github/codesandbox-app/static-template/tree/master",
   react: "new",
@@ -41,6 +42,8 @@ const TEMPLATES = {
 
 function validateNewProject(projectName, template) {
   const projectPath = path.join(process.cwd(), projectName);
+
+  console.log(projectPath);
 
   if (fs.existsSync(projectPath)) {
     logError(`😢 Sorry a directory with name ${projectName} already exists!`);
@@ -197,7 +200,7 @@ if (args.version) {
       break;
     }
     default: {
-      startDevServer(commandOrDirectory, PORT);
+      startDevServer({ directory: commandOrDirectory, port: PORT, openInBrowser: BROWSER.toLowerCase() !== 'none' });
     }
   }
 }
