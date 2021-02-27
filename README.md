@@ -193,6 +193,8 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
+<a href="https://www.producthunt.com/posts/blazepack?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-blazepack" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=286234&theme=light" alt="Blazepack - Blazing fast dev server powered by codesandbox bundler | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+
 Show your support by ⭐ the repo
 
 ## License
