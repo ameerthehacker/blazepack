@@ -36,5 +36,8 @@ jobs:
     - name: Instal dependencies
       run: npm ci
 
+    - name: Build Client
+      run: npm run build-client
+
     - name: Run e2e tests
       run: npm run e2e
