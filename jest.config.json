@@ -1,4 +1,4 @@
 {
   "preset": "jest-puppeteer",
-  "testTimeout": 10000
+  "testTimeout": 30000
 }

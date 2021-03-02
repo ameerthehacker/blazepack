@@ -1,13 +1,13 @@
 {
   "name": "blazepack",
-  "version": "0.0.25",
+  "version": "0.0.27",
   "description": "Blazing fast dev server powered by smooshpack",
   "main": "./bin/blazepack.js",
   "bin": {
     "blazepack": "./bin/blazepack.js"
   },
   "scripts": {
-    "e2e": "jest e2e --detectOpenHandles",
+    "e2e": "jest e2e --forceExit",
     "build-client": "parcel build src/client/index.js --out-dir src/lib",
     "dev-client": "parcel src/client/index.js --out-dir src/lib",
     "prepublish": "npm run build-client"

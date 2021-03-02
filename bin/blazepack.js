@@ -11,8 +11,9 @@ const startDevServer = require('../src/commands/start-dev-server');
 const cloneSandbox = require('../src/commands/clone-sandbox');
 const removePackage = require("../src/commands/remove-package");
 const exportSandbox = require("../src/commands/export-sandbox");
+const { TEMPLATES } = require("../src/constants");
 const pkg = require('../package.json');
-const { logError, logInfo } = require('../src/utils');
+const { logError, logInfo, logHelp } = require('../src/utils');
 
 // Checking for available updates
 const notifier = updateNotifier({ pkg });
@@ -23,22 +24,7 @@ const args = parseArgs(process.argv.slice(2));
 const commandOrDirectory = args._[0] || process.cwd();
 const DEFAULT_PORT = 3000;
 const PORT = args.port || DEFAULT_PORT;
-const BROWSER = args.browser || '';
-const TEMPLATES = {
-  static: "github/codesandbox-app/static-template/tree/master",
-  react: "new",
-  "react-ts": "react-typescript-react-ts",
-  "react-native-web": "react-native-q4qymyp2l6",
-  vanilla: "vanilla",
-  preact: "preact",
-  vue2: "vue",
-  vue3: "vue-3",
-  angular: "angular",
-  svelte: "svelte",
-  reason: "reason-reason",
-  dojo: "github/dojo/dojo-codesandbox-template/tree/master",
-  cxjs: "github/codaxy/cxjs-codesandbox-template/tree/master"
-};
+const BROWSER = args.browser || "";
 
 function validateNewProject(projectName, template) {
   const projectPath = path.join(process.cwd(), projectName);
@@ -197,6 +183,11 @@ if (args.version) {
       }
 
       cloneSandbox({ id: sandboxId });
+      break;
+    }
+    case "help": {
+      const command = args._[1];
+      logHelp(command);
       break;
     }
     default: {
