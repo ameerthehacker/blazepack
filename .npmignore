@@ -8,7 +8,7 @@ playground/
 src/client/www
 e2e/
 *.spec
-jest-puppeteer.config.js
+jest-puppeteer.config.json
 .github
 jest.config.js
 .all-contributorsrc
