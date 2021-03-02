@@ -7,7 +7,7 @@ src/client/
 playground/
 src/client/www
 e2e/
-*.spec
+*.spec.js
 jest-puppeteer.config.js
 .github
 jest.config.json
