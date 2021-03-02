@@ -18,7 +18,7 @@ const { blue, underline } = require('chalk');
 
 let sandboxFiles;
 
-function startDevServer({ directory, port, openInBrowser }) {
+function startDevServer({ directory, port, openInBrowser = true }) {
   try {
     detectTemplate(directory);
   } catch (err) {
