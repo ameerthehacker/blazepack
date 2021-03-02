@@ -3,7 +3,6 @@ const parseArgs = require('minimist');
 const { blue, underline } = require('chalk');
 const updateNotifier = require('update-notifier');
 const cliSelect = require('cli-select');
-const path = require('path');
 const fs = require('fs');
 const createProject = require('../src/commands/create-project');
 const installPackage = require('../src/commands/install-package');
@@ -21,29 +20,26 @@ const notifier = updateNotifier({ pkg });
 notifier.notify({ isGlobal: true });
 
 const args = parseArgs(process.argv.slice(2));
-const commandOrDirectory = args._[0] || process.cwd();
+const command = args._[0];
+const directory = args._[1] || process.cwd();
 const DEFAULT_PORT = 3000;
 const PORT = args.port || DEFAULT_PORT;
 const BROWSER = args.browser || "";
 
 function validateNewProject(projectName, template) {
-  const projectPath = path.join(process.cwd(), projectName);
+  if (!projectName) {
+    logError(`Required argument project name was not provided`);
 
-  console.log(projectPath);
+    process.exit(1);
+  }
 
-  if (fs.existsSync(projectPath)) {
+  if (fs.existsSync(projectName)) {
     logError(`😢 Sorry a directory with name ${projectName} already exists!`);
 
     process.exit(1);
   }
 
   const availableTemplates = Object.keys(TEMPLATES).join(", ");
-
-  if (!projectName) {
-    logError(`Required argument project name was not provided`);
-
-    process.exit(1);
-  }
 
   if (template && !TEMPLATES[template]) {
     logError(
@@ -83,7 +79,14 @@ function validateNewProject(projectName, template) {
 if (args.version) {
   console.log(`v${pkg.version}`);
 } else {
-  switch (commandOrDirectory) {
+  // show the help for requested command
+  if (args.help) {
+    logHelp(command);
+
+    process.exit(0);
+  }
+
+  switch (command) {
     case "add":
     case "install": {
       const package = args._[1];
@@ -119,7 +122,7 @@ if (args.version) {
           createProject({
             projectName,
             templateId,
-            startServer: false,
+            startServer: args.open,
             port: PORT,
           });
         }
@@ -128,19 +131,7 @@ if (args.version) {
       break;
     }
     case "start": {
-      const projectName = args._[1];
-      const template = args.template;
-
-      validateNewProject(projectName, template).then(templateId => {
-        if (templateId) {
-          createProject({
-            projectName,
-            templateId,
-            startServer: true,
-            port: PORT,
-          });
-        }
-      });
+      startDevServer({ directory, port: PORT, openInBrowser: BROWSER.toLowerCase() !== 'none' });
 
       break;
     }
@@ -185,13 +176,8 @@ if (args.version) {
       cloneSandbox({ id: sandboxId });
       break;
     }
-    case "help": {
-      const command = args._[1];
-      logHelp(command);
-      break;
-    }
     default: {
-      startDevServer({ directory: commandOrDirectory, port: PORT, openInBrowser: BROWSER.toLowerCase() !== 'none' });
+      logHelp();
     }
   }
 }
