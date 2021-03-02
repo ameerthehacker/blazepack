@@ -49,7 +49,7 @@ blazepack create my-cra --template=react
 
 # create the app and also start the dev server
 
-blazepack start my-angular-app --template=angular
+blazepack create my-angular-app --template=angular --open
 ```
 
 <details>
@@ -78,19 +78,19 @@ blazepack start my-angular-app --template=angular
 To use it in your existing **create react app**, **angular**, **preact**, **svelte**, **vue cli app** just run
 
 ```
-blazepack
+blazepack start
 ```
 
 It will start the dev server at port **3000** and open it in browser, you can change the default port by using the **port** option
 
 ```
-blazepack --port 3001
+blazepack start --port 3001
 ```
 
 You can also run it using the **npx** command and not install it globally
 
 ```
-npx blazepack
+npx blazepack start
 ```
 
 ### Install dependency
@@ -165,11 +165,11 @@ blazepack export --open
 You can know more about the available commands and their options using the help command
 
 ```
-blazepack help
+blazepack --help
 
 # get help on individual command
 
-blazepack help start
+blazepack start --help
 ```
 
 ## Contributors ✨
