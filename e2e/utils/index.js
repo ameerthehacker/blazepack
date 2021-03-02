@@ -12,7 +12,7 @@ function runBlazepackCmd(cmd, cb) {
 }
 
 function startDevServer(directory) {
-  return runBlazepackCmd(directory);
+  return runBlazepackCmd(`start ${directory}`);
 }
 
 function createApp(projectName, template) {
