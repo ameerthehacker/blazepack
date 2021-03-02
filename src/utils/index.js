@@ -9,7 +9,7 @@ const getAllFiles = require('get-all-files').default;
 const { TEMPLATES } = require('../constants');
 
 function logError(message) {
-  console.log(red(message));
+  console.error(red(message));
 }
 
 function logSuccess(message) {
@@ -23,23 +23,22 @@ function logInfo(message) {
 function logHelp(command) {
   const mainHelp = `
 Usage:
-  blazepack   Start dev server on existing project
-  blazepack   [options]  [command]
+  blazepack   [options]  <command>
 
 Options:
   --version   Output the current version
   --port <p>  Specify port <p> for dev server
+  --help      Provides help
 
 Commands:
+  start           Starts the dev server
   create          Create project from Template
-  start           Create project from Template & Start the dev server
   clone           Clone an existing codesandbox
   export          Export to codesandbox.io
   install         Install dependency
   add             Install dependency (alias for install)
   uninstall       Remove dependency
   remove          Remove dependency (alias for uninstall)
-  help [command]  Show help for a particular command
 `;
   if (!command) {
     console.log(mainHelp);
@@ -47,13 +46,14 @@ Commands:
     switch (command) {
       case 'create':
         console.log(`
-Usage: blazepack create <name> [--template=<template>]
+Usage: blazepack create <name> [--template=<template>][--open]
         
 Create project with name <name> from Template <template>.
 If the --template option is not specified you will get the
+If the --open options is specified then dev server will be stated in the newly created project
 list of available templates to select from. 
 
-eg: blazepack create my-cra --template=react
+eg: blazepack create my-cra --template=react --open
 
 List of available templates are:`);
         Object.keys(TEMPLATES).forEach(template => {
@@ -62,33 +62,11 @@ List of available templates are:`);
         break;
       case 'start':
         console.log(`
-Usage: blazepack start <name> [--template=<template>]
+Usage: blazepack start [directory][--port=<port>]
         
-Create project with name <name> from Template <template> & also start the dev server.
-If the --template option is not specified you will get the list of available templates to select from. 
-
-eg: blazepack start my-angular-app --template=angular
-
-List of available templates are:`);
-        Object.keys(TEMPLATES).forEach(template => {
-          console.log(`  ${template}`);
-        });
-        break;
-      case 'clone':
-        console.log(`
-Usage: blazepack clone <url | embed-url | sandbox-id>
-
-Clone an existing codesandbox.
-You can clone using a url or embed-url or sandbox-id.  
-
-eg: Clone from URL:
-blazepack clone https://codesandbox.io/s/use-undo-redo-yrts1
-
-eg: Cloning from Embed URL:
-blazepack clone https://codesandbox.io/embed/use-undo-redo-yrts1
-
-eg: Clone from Sandbox Id:
-blazepack clone use-undo-redo-yrts1
+Starts the dev server in the given directory
+If no directory is specified then the current working directory is used
+You can change the port on which the dev server runs using the --port option
 `);
         break;
       case 'export':
@@ -99,6 +77,13 @@ Export your current project to codesandbox.io & also open the newly
 created sandbox in a browser tab if the --open option is specified.
 `);
         break;
+        case 'clone':
+          console.log(`
+Usage: blazepack clone <sandbox-url|sandbox-id|embed-url>
+
+Clone the sandbox from the given sadbox url, id or embed-url
+`);
+          break;
       case 'install':
         console.log(`\nUsage: blazepack install <package>`);
       case 'add':
@@ -387,6 +372,70 @@ function readSandboxFromFS (directory, exportFormat = false) {
   return sandboxFiles;
 }
 
+function hasDependency(packageJSON, dependency) {
+  const dependencies = Object.keys(packageJSON.dependencies || {});
+  const devDependencies = Object.keys(packageJSON.devDependencies || {});
+
+  return dependencies.includes(dependency) || devDependencies.includes(dependency);
+}
+
+function detectTemplate(directory) {
+  const sandboxConfig = path.join(directory, 'sandbox.config.json');
+  const packageJSON = path.join(directory, 'package.json');
+
+  if (!fs.existsSync(packageJSON) && !fs.existsSync(sandboxConfig)) {
+    throw "Unknown project template!";
+  }
+
+  if (fs.existsSync(sandboxConfig)) {
+    try {
+      const sandboxConfigContent = JSON.parse(fs.readFileSync(sandboxConfig));
+
+      return sandboxConfigContent.template;
+    } catch {
+      throw "Invalid sandbox.config.json"
+    }
+  }
+
+  if (fs.existsSync(packageJSON)) {
+    try {
+      const packageJSONContent = JSON.parse(fs.readFileSync(packageJSON));
+
+      if (hasDependency(packageJSONContent, "react-scripts")) {
+        return "react";
+      }
+      if (hasDependency(packageJSONContent, "svelte")) {
+        return "svelte";
+      }
+      if (hasDependency(packageJSONContent, "parcel-bundler")) {
+        return "parcel";
+      }
+      if (hasDependency(packageJSONContent, "preact")) {
+        return "preact";
+      }
+      if (hasDependency(packageJSONContent, "@vue/cli-service")) {
+        return "vue";
+      }
+      if (hasDependency(packageJSONContent, "@angular/core")) {
+        return "angular";
+      }
+      if (hasDependency(packageJSONContent, "reason-react")) {
+        return "reason-reason";
+      }
+      if (hasDependency(packageJSONContent, "@dojo/cli")) {
+        return "dojo";
+      }
+      if (hasDependency(packageJSONContent, "cx-react")) {
+        return "cxjs";
+      }
+    } catch {
+      throw "Invalid package.json"
+    }
+
+    throw "Unknown project template!";
+  }
+} 
+
 module.exports = {
   logError,
   logInfo,
@@ -398,5 +447,6 @@ module.exports = {
   getExtension,
   getPackageJSON,
   readSandboxFromFS,
-  getPosixPath
+  getPosixPath,
+  detectTemplate
 };

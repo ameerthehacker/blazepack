@@ -8,6 +8,8 @@
   },
   "scripts": {
     "e2e": "jest e2e --forceExit",
+    "test": "jest src",
+    "test:watch": "jest src --watch",
     "build-client": "parcel build src/client/index.js --out-dir src/lib",
     "dev-client": "parcel src/client/index.js --out-dir src/lib",
     "prepublish": "npm run build-client"
