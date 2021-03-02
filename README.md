@@ -5,8 +5,11 @@
 </p>
 
 <p align="center">
+  <a href="https://actions-badge.atrox.dev/ameerthehacker/blazepack/goto?ref=master">
+    <img alt="Build Status" src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fameerthehacker%2Fblazepack%2Fbadge%3Fref%3Dmaster&style=flat-square" />
+  </a>
   <a href="https://discord.gg/ZP6p5dVwnn">
-  <img src="https://img.shields.io/discord/591914197219016707.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
+    <img src="https://img.shields.io/discord/591914197219016707.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
   </a>
   <a href="http://makeapullrequest.com">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome">
