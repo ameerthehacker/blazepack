@@ -9,7 +9,7 @@ const getAllFiles = require('get-all-files').default;
 const { TEMPLATES } = require('../constants');
 
 function logError(message) {
-  console.log(red(message));
+  console.error(red(message));
 }
 
 function logSuccess(message) {
@@ -387,6 +387,70 @@ function readSandboxFromFS (directory, exportFormat = false) {
   return sandboxFiles;
 }
 
+function hasDependency(packageJSON, dependency) {
+  const dependencies = Object.keys(packageJSON.dependencies || {});
+  const devDependencies = Object.keys(packageJSON.devDependencies || {});
+
+  return dependencies.includes(dependency) || devDependencies.includes(dependency);
+}
+
+function detectTemplate(directory) {
+  const sandboxConfig = path.join(directory, 'sandbox.config.json');
+  const packageJSON = path.join(directory, 'package.json');
+
+  if (!fs.existsSync(packageJSON) && !fs.existsSync(sandboxConfig)) {
+    throw "Unknown project template!";
+  }
+
+  if (fs.existsSync(sandboxConfig)) {
+    try {
+      const sandboxConfigContent = JSON.parse(fs.readFileSync(sandboxConfig));
+
+      return sandboxConfigContent.template;
+    } catch {
+      throw "Invalid sandbox.config.json"
+    }
+  }
+
+  if (fs.existsSync(packageJSON)) {
+    try {
+      const packageJSONContent = JSON.parse(fs.readFileSync(packageJSON));
+
+      if (hasDependency(packageJSONContent, "react-scripts")) {
+        return "react";
+      }
+      if (hasDependency(packageJSONContent, "svelte")) {
+        return "svelte";
+      }
+      if (hasDependency(packageJSONContent, "parcel")) {
+        return "parcel";
+      }
+      if (hasDependency(packageJSONContent, "preact")) {
+        return "preact";
+      }
+      if (hasDependency(packageJSONContent, "@vue/cli-service")) {
+        return "vue";
+      }
+      if (hasDependency(packageJSONContent, "@angular/core")) {
+        return "angular";
+      }
+      if (hasDependency(packageJSONContent, "reason-react")) {
+        return "reason-reason";
+      }
+      if (hasDependency(packageJSONContent, "@dojo/cli")) {
+        return "dojo";
+      }
+      if (hasDependency(packageJSONContent, "cx-react")) {
+        return "cxjs";
+      }
+    } catch {
+      throw "Invalid package.json"
+    }
+
+    throw "Unknown project template!";
+  }
+} 
+
 module.exports = {
   logError,
   logInfo,
@@ -398,5 +462,6 @@ module.exports = {
   getExtension,
   getPackageJSON,
   readSandboxFromFS,
-  getPosixPath
+  getPosixPath,
+  detectTemplate
 };

@@ -11,13 +11,22 @@ const {
   logInfo,
   getExtension,
   readSandboxFromFS,
-  getPosixPath
+  getPosixPath,
+  detectTemplate
 } = require('../../utils');
 const { blue, underline } = require('chalk');
 
 let sandboxFiles;
 
 function startDevServer({ directory, port, openInBrowser }) {
+  try {
+    detectTemplate(directory);
+  } catch (err) {
+    logError(`😢 ${err}`);
+
+    process.exit(1);
+  }
+
   const ROOT_DIR = path.join(__dirname, '..', '..');
   const WWW_PATH = path.join(ROOT_DIR, 'client', 'www');
   const INDEX_HTML_PATH = path.join(WWW_PATH, 'index.html');
