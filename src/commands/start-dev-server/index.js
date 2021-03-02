@@ -17,7 +17,7 @@ const { blue, underline } = require('chalk');
 
 let sandboxFiles;
 
-function startDevServer(directory, port) {
+function startDevServer({ directory, port, openInBrowser }) {
   const ROOT_DIR = path.join(__dirname, '..', '..');
   const WWW_PATH = path.join(ROOT_DIR, 'client', 'www');
   const INDEX_HTML_PATH = path.join(WWW_PATH, 'index.html');
@@ -197,7 +197,7 @@ function startDevServer(directory, port) {
         const devServerURL = blue(underline(`http://localhost:${port}`));
 
         console.log(`⚡ Blazepack dev server running at ${devServerURL}`);
-        openBrowser(`http://localhost:${port}`);
+        if(openInBrowser) openBrowser(`http://localhost:${port}`);
       })
       .on('all', (event, filePath) => {
         const relativePath = `/${getPosixPath(path.relative(directory, filePath))}`;

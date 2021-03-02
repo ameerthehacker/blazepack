@@ -7,6 +7,7 @@
     "blazepack": "./bin/blazepack.js"
   },
   "scripts": {
+    "e2e": "jest e2e --forceExit",
     "build-client": "parcel build src/client/index.js --out-dir src/lib",
     "dev-client": "parcel src/client/index.js --out-dir src/lib",
     "prepublish": "npm run build-client"
@@ -28,8 +29,13 @@
   },
   "homepage": "https://github.com/ameerthehacker/blazepack#readme",
   "devDependencies": {
+    "@types/jest": "^26.0.20",
     "all-contributors-cli": "^6.20.0",
-    "parcel-bundler": "^1.12.4"
+    "jest": "^26.6.3",
+    "jest-puppeteer": "^4.4.0",
+    "parcel-bundler": "^1.12.4",
+    "puppeteer": "^8.0.0",
+    "rimraf": "^3.0.2"
   },
   "dependencies": {
     "chalk": "^4.1.0",

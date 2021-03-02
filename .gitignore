@@ -121,3 +121,4 @@ src/static/index.js
 playground/
 src/client/www
 lib/
+fixtures

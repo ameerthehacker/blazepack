@@ -20,7 +20,7 @@ async function createProject({ projectName, templateId, startServer, port }) {
     
     if (startServer) {
       logInfo(`🚀 Starting project ${projectName}...`);
-      startDevServer(projectPath, port);
+      startDevServer({ directory: projectPath, port });
     }
   } catch (err) {
     logError(`😢 Unable to create new project: ${err}`);

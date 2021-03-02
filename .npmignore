@@ -6,3 +6,4 @@ src/client/
 .cache/
 playground/
 src/client/www
+e2e/
