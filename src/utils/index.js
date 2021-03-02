@@ -422,7 +422,7 @@ function detectTemplate(directory) {
       if (hasDependency(packageJSONContent, "svelte")) {
         return "svelte";
       }
-      if (hasDependency(packageJSONContent, "parcel")) {
+      if (hasDependency(packageJSONContent, "parcel-bundler")) {
         return "parcel";
       }
       if (hasDependency(packageJSONContent, "preact")) {

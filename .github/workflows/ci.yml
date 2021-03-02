@@ -38,6 +38,9 @@ jobs:
 
     - name: Build Client
       run: npm run build-client
+    
+    - name: Run unit tests
+      run: npm run test
 
     - name: Run e2e tests
       run: npm run e2e

@@ -69,6 +69,16 @@ describe("utils", () => {
       expect(detectTemplate(cwd)).toBe("reason-reason");
     });
 
+    it("should detect parcel template", () => {
+      mockFile(packageJSON, JSON.stringify({
+        "dependencies": {
+          "parcel-bundler": "2.0.0"
+        }
+      }));
+
+      expect(detectTemplate(cwd)).toBe("parcel");
+    });
+
     it("should detect angular template", () => {
       mockFile(packageJSON, JSON.stringify({
         "dependencies": {
