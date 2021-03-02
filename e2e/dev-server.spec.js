@@ -1,6 +1,7 @@
 const { startDevServer, waitFor, cleanFixtures, createApp } = require('./utils');
 const path = require('path');
 const fs = require('fs');
+const waitPort = require('wait-port');
 
 const REACT_APP = path.join('e2e', 'fixtures', 'react-app');
 
@@ -18,9 +19,16 @@ describe("Dev Server", () => {
       devServer.on('exit', resolve);
     });
 
-    await waitFor(2000);
+    await waitPort({
+      host: 'localhost',
+      protocol: 'http',
+      port: 3000,
+      timeout: 10000,
+      output: "silent"
+    });
     await page.goto('http://localhost:3000'); 
-    await waitFor(5000);
+    // wait until the page is loaded
+    await page.waitForSelector('h1');
   });
 
   it("should update document title", async () => {
@@ -39,7 +47,8 @@ describe("Dev Server", () => {
 
   it("spa routing should works", async () => {
     await page.goto('http://localhost:3000/about');
-    await waitFor(3000);
+    // wait until the page is loaded
+    await page.waitForSelector('h1');
 
     const headingText = await page.evaluate(() => {
       const heading = document.getElementsByTagName("h1")[0];
