@@ -1,6 +1,6 @@
 {
   "name": "blazepack",
-  "version": "0.0.35",
+  "version": "0.0.36",
   "description": "Blazing fast dev server powered by smooshpack",
   "main": "./bin/blazepack.js",
   "bin": {
@@ -15,7 +15,6 @@
     "dev-client": "parcel src/client/index.js --out-dir src/lib",
     "prepublish": "npm run build-client",
     "postinstall": "husky install",
-    "prepare": "husky install",
     "prettify": "pretty-quick --staged"
   },
   "repository": {
