@@ -49,9 +49,8 @@ Commands:
 Usage: blazepack create <name> [--template=<template>][--open]
         
 Create project with name <name> from Template <template>.
-If the --template option is not specified you will get the
-If the --open options is specified then dev server will be stated in the newly created project
-list of available templates to select from. 
+If the --template option is not specified you will get the list of available templates to select from.
+If the --open options is specified then dev server will be stated in the newly created project.
 
 eg: blazepack create my-cra --template=react --open
 
@@ -64,24 +63,24 @@ List of available templates are:`);
         console.log(`
 Usage: blazepack start [directory][--port=<port>]
         
-Starts the dev server in the given directory
-If no directory is specified then the current working directory is used
-You can change the port on which the dev server runs using the --port option
+Starts the dev server in the given directory.
+If no directory is specified then the current working directory is used.
+You can change the port on which the dev server runs using the --port option.
 `);
         break;
       case 'export':
         console.log(`
 Usage: blazepack export [--open]
 
-Export your current project to codesandbox.io & also open the newly
-created sandbox in a browser tab if the --open option is specified.
+Export your current project to codesandbox.io.
+Opens the sandbox in a browser tab if the --open option is specified.
 `);
         break;
       case 'clone':
         console.log(`
-Usage: blazepack clone <sandbox-url|sandbox-id|embed-url>
+Usage: blazepack clone <sandbox-url|sandbox-id|embed-url>.
 
-Clone the sandbox from the given sadbox url, id or embed-url
+Clone the sandbox from the given sadbox url, id or embed-url.
 `);
         break;
       case 'install':
