@@ -4,7 +4,7 @@ import { name } from '../../package.json';
 const compile = window.compile;
 const getSandboxTemplate = window.getTemplate;
 const getTemplateDefinition = window.getTemplateDefinition;
-const info = (message) => console.log(`${name}: ${message}`)
+const info = (message) => console.log(`${name}: ${message}`);
 const ws = new WebSocket(`ws://${window.location.host}`);
 let sandboxFiles;
 
@@ -48,9 +48,14 @@ ws.onmessage = (evt) => {
       case WS_EVENTS.INIT: {
         sandboxFiles = data;
         const sandboxTemplate = getSandboxTemplateName(sandboxFiles);
-        const sandboxTemplateDefinition = getTemplateDefinition(sandboxTemplate);
+        const sandboxTemplateDefinition = getTemplateDefinition(
+          sandboxTemplate
+        );
         // sandpack throws error for angular for some unknown reason
-        const htmlEntryFiles = sandboxTemplateDefinition.name === 'angular-cli' ? ['/src/index.html'] : sandboxTemplateDefinition.getHTMLEntries();
+        const htmlEntryFiles =
+          sandboxTemplateDefinition.name === 'angular-cli'
+            ? ['/src/index.html']
+            : sandboxTemplateDefinition.getHTMLEntries();
 
         for (const htmlEntryFile of htmlEntryFiles) {
           if (sandboxFiles[htmlEntryFile] && sandboxFiles[htmlEntryFile].code) {
@@ -66,7 +71,7 @@ ws.onmessage = (evt) => {
           codesandbox: true,
           externalResources: [],
           template: getSandboxTemplateName(sandboxFiles),
-          isInitializationCompile: true
+          isInitializationCompile: true,
         });
 
         break;
@@ -76,22 +81,25 @@ ws.onmessage = (evt) => {
         const filename = getFilename(path);
 
         // we need to reload so that sandpack can install the package
-        if (filename === "package.json") {
+        if (filename === 'package.json') {
           window.location.reload();
         }
 
         // do a full page reload on new file or folder creation or deletion
-        if (event === "add" || event === "unlink") {
+        if (event === 'add' || event === 'unlink') {
           window.location.reload();
         }
 
-        const updatedFiles = { ...sandboxFiles, [path]: { code: fileContent, path } };
+        const updatedFiles = {
+          ...sandboxFiles,
+          [path]: { code: fileContent, path },
+        };
 
         compile({
           modules: updatedFiles,
           codesandbox: true,
           externalResources: [],
-          template: getSandboxTemplateName(updatedFiles)
+          template: getSandboxTemplateName(updatedFiles),
         });
 
         break;
@@ -102,10 +110,10 @@ ws.onmessage = (evt) => {
       JSON.stringify({
         type: WS_EVENTS.UNHANDLED_SANDPACK_ERROR,
         data: {
-          title: "Unhandled Sandpack error while running the app.",
+          title: 'Unhandled Sandpack error while running the app.',
           message: e.message,
         },
       })
     );
   }
-}
+};

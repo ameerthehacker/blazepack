@@ -1,9 +1,9 @@
 const { red, blue, green } = require('chalk');
-const https = require("https");
-const findPackageJSON = require("find-package-json");
-const detectIndent = require("detect-indent");
-const fs = require("fs");
-const path = require("path");
+const https = require('https');
+const findPackageJSON = require('find-package-json');
+const detectIndent = require('detect-indent');
+const fs = require('fs');
+const path = require('path');
 const Stream = require('stream').Transform;
 const getAllFiles = require('get-all-files').default;
 const { TEMPLATES } = require('../constants');
@@ -56,7 +56,7 @@ list of available templates to select from.
 eg: blazepack create my-cra --template=react --open
 
 List of available templates are:`);
-        Object.keys(TEMPLATES).forEach(template => {
+        Object.keys(TEMPLATES).forEach((template) => {
           console.log(`  ${template}`);
         });
         break;
@@ -77,13 +77,13 @@ Export your current project to codesandbox.io & also open the newly
 created sandbox in a browser tab if the --open option is specified.
 `);
         break;
-        case 'clone':
-          console.log(`
+      case 'clone':
+        console.log(`
 Usage: blazepack clone <sandbox-url|sandbox-id|embed-url>
 
 Clone the sandbox from the given sadbox url, id or embed-url
 `);
-          break;
+        break;
       case 'install':
         console.log(`\nUsage: blazepack install <package>`);
       case 'add':
@@ -130,14 +130,14 @@ blazepack remove redux
 function getExtension(filename) {
   const fileParts = filename.split('.');
 
-  return fileParts.length > 1? fileParts[fileParts.length - 1]: null;
+  return fileParts.length > 1 ? fileParts[fileParts.length - 1] : null;
 }
 
 function isImage(filename) {
   const ext = getExtension(filename);
   const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
 
-  return imageExtensions.includes(ext)
+  return imageExtensions.includes(ext);
 }
 
 function getSandboxFiles(id) {
@@ -145,19 +145,19 @@ function getSandboxFiles(id) {
     https
       .get(`https://codesandbox.io/api/v1/sandboxes/${id}`, (response) => {
         if (response.statusCode == 200) {
-          let data = "";
-          response.on("data", (chunk) => {
+          let data = '';
+          response.on('data', (chunk) => {
             data += chunk;
           });
 
-          response.on("end", () => {
+          response.on('end', () => {
             resolve(JSON.parse(data));
           });
         } else {
           reject(`failed to download sandbox for ${id}`);
         }
       })
-      .on("error", (e) => {
+      .on('error', (e) => {
         reject(e);
       });
   });
@@ -169,18 +169,18 @@ function downloadImage(url) {
       .get(url, (response) => {
         if (response.statusCode == 200) {
           let data = new Stream();
-          response.on("data", (chunk) => {
+          response.on('data', (chunk) => {
             data.push(chunk);
           });
 
-          response.on("end", () => {
+          response.on('end', () => {
             resolve(data.read());
           });
         } else {
           reject(`failed to download image ${url}`);
         }
       })
-      .on("error", (e) => {
+      .on('error', (e) => {
         reject(e);
       });
   });
@@ -205,7 +205,8 @@ async function createSandboxFiles(sandboxInfo, projectName) {
    */
   // create an empty dir for our project
   const projectDir = projectName || sandboxInfo.title || sandboxInfo.id;
-  if (projectDir) fs.mkdirSync(projectName || sandboxInfo.title || sandboxInfo.id);
+  if (projectDir)
+    fs.mkdirSync(projectName || sandboxInfo.title || sandboxInfo.id);
 
   const directories = sandboxInfo.directories.reduce(
     (agg, directory) => ({
@@ -221,7 +222,7 @@ async function createSandboxFiles(sandboxInfo, projectName) {
   /**
    * Get directory name recursively
    */
-  const getFolderName = (id, currentDir = "") => {
+  const getFolderName = (id, currentDir = '') => {
     if (!id || !directories[id]) {
       return currentDir;
     }
@@ -252,10 +253,7 @@ async function createSandboxFiles(sandboxInfo, projectName) {
   /**
    * Project path with the sandbox name
    */
-  const projectPath = path.join(
-    process.cwd(),
-    projectDir
-  );
+  const projectPath = path.join(process.cwd(), projectDir);
 
   /**
    * Create all directories, recursive: true; forces the directory creation if not present
@@ -289,26 +287,26 @@ async function createSandboxFiles(sandboxInfo, projectName) {
 }
 
 const getPackageJSON = () => {
-   const iterator = findPackageJSON();
-    const nextPackageJSON = iterator.next();
+  const iterator = findPackageJSON();
+  const nextPackageJSON = iterator.next();
 
-    if (nextPackageJSON && nextPackageJSON.filename) {
-      const packageJSONContent = fs.readFileSync(
-        nextPackageJSON.filename,
-        "utf-8"
-      );
+  if (nextPackageJSON && nextPackageJSON.filename) {
+    const packageJSONContent = fs.readFileSync(
+      nextPackageJSON.filename,
+      'utf-8'
+    );
 
-      const packageJSON = JSON.parse(packageJSONContent);
+    const packageJSON = JSON.parse(packageJSONContent);
 
-      return {
-        file: nextPackageJSON.filename,
-        indent: detectIndent(packageJSONContent).indent || 2,
-        json: packageJSON,
-      };
-    }
+    return {
+      file: nextPackageJSON.filename,
+      indent: detectIndent(packageJSONContent).indent || 2,
+      json: packageJSON,
+    };
+  }
 
-    return null;
-}
+  return null;
+};
 
 function getPosixPath(filePath) {
   return filePath.split(path.sep).join(path.posix.sep);
@@ -322,29 +320,23 @@ function readAsDataUrlSync(filePath) {
   return `data:image/${ext};base64,${fileContent}`;
 }
 
-function readSandboxFromFS (directory, exportFormat = false) {
-  const IGNORED_DIRECTORIES = [
-    /node_modules/,
-    /.git/,
-    /.cache/
-  ];
-  const IGNORED_FILES = [
-    /yarn.lock/,
-    /package-lock.json/,
-    /.gitignore/
-  ]
-  
+function readSandboxFromFS(directory, exportFormat = false) {
+  const IGNORED_DIRECTORIES = [/node_modules/, /.git/, /.cache/];
+  const IGNORED_FILES = [/yarn.lock/, /package-lock.json/, /.gitignore/];
+
   let sandboxFiles = {};
   // get all files in the dir except node modules
   const filePaths = getAllFiles.sync.array(directory, {
     resolve: true,
-    isExcludedDir: (dirname) => IGNORED_DIRECTORIES.find(excludedDir => excludedDir.test(dirname))
+    isExcludedDir: (dirname) =>
+      IGNORED_DIRECTORIES.find((excludedDir) => excludedDir.test(dirname)),
   });
 
-
-  filePaths.forEach(filePath => {
+  filePaths.forEach((filePath) => {
     // we don't want to read unnecessary huge files
-    const isExcludedFile = IGNORED_FILES.find(excludedFile => excludedFile.test(filePath));
+    const isExcludedFile = IGNORED_FILES.find((excludedFile) =>
+      excludedFile.test(filePath)
+    );
     const filename = path.basename(filePath);
 
     if (isExcludedFile) return;
@@ -361,12 +353,14 @@ function readSandboxFromFS (directory, exportFormat = false) {
     const sandboxFilePath = `/${relativePath}`;
 
     // we use the export format in the export sandbox command
-    sandboxFiles[sandboxFilePath] = exportFormat? {
-      content: fileContent
-    }: {
-      code: fileContent,
-      path: sandboxFilePath
-    };
+    sandboxFiles[sandboxFilePath] = exportFormat
+      ? {
+          content: fileContent,
+        }
+      : {
+          code: fileContent,
+          path: sandboxFilePath,
+        };
   });
 
   return sandboxFiles;
@@ -376,7 +370,9 @@ function hasDependency(packageJSON, dependency) {
   const dependencies = Object.keys(packageJSON.dependencies || {});
   const devDependencies = Object.keys(packageJSON.devDependencies || {});
 
-  return dependencies.includes(dependency) || devDependencies.includes(dependency);
+  return (
+    dependencies.includes(dependency) || devDependencies.includes(dependency)
+  );
 }
 
 function detectTemplate(directory) {
@@ -384,7 +380,7 @@ function detectTemplate(directory) {
   const packageJSON = path.join(directory, 'package.json');
 
   if (!fs.existsSync(packageJSON) && !fs.existsSync(sandboxConfig)) {
-    throw "Unknown project template!";
+    throw 'Unknown project template!';
   }
 
   if (fs.existsSync(sandboxConfig)) {
@@ -393,7 +389,7 @@ function detectTemplate(directory) {
 
       return sandboxConfigContent.template;
     } catch {
-      throw "Invalid sandbox.config.json"
+      throw 'Invalid sandbox.config.json';
     }
   }
 
@@ -401,40 +397,40 @@ function detectTemplate(directory) {
     try {
       const packageJSONContent = JSON.parse(fs.readFileSync(packageJSON));
 
-      if (hasDependency(packageJSONContent, "react-scripts")) {
-        return "react";
+      if (hasDependency(packageJSONContent, 'react-scripts')) {
+        return 'react';
       }
-      if (hasDependency(packageJSONContent, "svelte")) {
-        return "svelte";
+      if (hasDependency(packageJSONContent, 'svelte')) {
+        return 'svelte';
       }
-      if (hasDependency(packageJSONContent, "parcel-bundler")) {
-        return "parcel";
+      if (hasDependency(packageJSONContent, 'parcel-bundler')) {
+        return 'parcel';
       }
-      if (hasDependency(packageJSONContent, "preact")) {
-        return "preact";
+      if (hasDependency(packageJSONContent, 'preact')) {
+        return 'preact';
       }
-      if (hasDependency(packageJSONContent, "@vue/cli-service")) {
-        return "vue";
+      if (hasDependency(packageJSONContent, '@vue/cli-service')) {
+        return 'vue';
       }
-      if (hasDependency(packageJSONContent, "@angular/core")) {
-        return "angular";
+      if (hasDependency(packageJSONContent, '@angular/core')) {
+        return 'angular';
       }
-      if (hasDependency(packageJSONContent, "reason-react")) {
-        return "reason-reason";
+      if (hasDependency(packageJSONContent, 'reason-react')) {
+        return 'reason-reason';
       }
-      if (hasDependency(packageJSONContent, "@dojo/cli")) {
-        return "dojo";
+      if (hasDependency(packageJSONContent, '@dojo/cli')) {
+        return 'dojo';
       }
-      if (hasDependency(packageJSONContent, "cx-react")) {
-        return "cxjs";
+      if (hasDependency(packageJSONContent, 'cx-react')) {
+        return 'cxjs';
       }
     } catch {
-      throw "Invalid package.json"
+      throw 'Invalid package.json';
     }
 
-    throw "Unknown project template!";
+    throw 'Unknown project template!';
   }
-} 
+}
 
 module.exports = {
   logError,
@@ -448,5 +444,5 @@ module.exports = {
   getPackageJSON,
   readSandboxFromFS,
   getPosixPath,
-  detectTemplate
+  detectTemplate,
 };

@@ -16,8 +16,10 @@ function startDevServer(directory) {
 }
 
 function createApp(projectName, template) {
-  return new Promise(resolve => {
-    const childProcess = runBlazepackCmd(`create ${projectName} --template=${template}`);
+  return new Promise((resolve) => {
+    const childProcess = runBlazepackCmd(
+      `create ${projectName} --template=${template}`
+    );
 
     childProcess.on('exit', resolve);
   });
@@ -31,7 +33,7 @@ function cleanFixtures() {
   return new Promise((resolve, reject) => {
     rm(FIXTURE_PATH, (err) => {
       fs.mkdirSync(FIXTURE_PATH);
-      
+
       if (!err) resolve();
       else reject(err);
     });
@@ -44,5 +46,5 @@ module.exports = {
   startDevServer,
   createApp,
   waitFor,
-  cleanFixtures
+  cleanFixtures,
 };

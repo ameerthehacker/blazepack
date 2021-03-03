@@ -5,30 +5,28 @@ const { logError, logSuccess, getPackageJSON } = require('../../utils');
 async function installPackage(package) {
   try {
     const [packageName, version] = package.split('@');
-     const potentialJSON = getPackageJSON();
+    const potentialJSON = getPackageJSON();
 
-     if (potentialJSON) {
-       const { json: packageJSON, indent, file } = potentialJSON;
-       const latestVersion = await getLatestPackageVersion(packageName);
-       const packageVersion = version || latestVersion;
+    if (potentialJSON) {
+      const { json: packageJSON, indent, file } = potentialJSON;
+      const latestVersion = await getLatestPackageVersion(packageName);
+      const packageVersion = version || latestVersion;
 
-       if (packageJSON.dependencies) {
-         packageJSON.dependencies = {
-           ...packageJSON.dependencies,
-           [packageName]: `^${packageVersion}`,
-         };
-       }
+      if (packageJSON.dependencies) {
+        packageJSON.dependencies = {
+          ...packageJSON.dependencies,
+          [packageName]: `^${packageVersion}`,
+        };
+      }
 
-       fs.writeFileSync(
-         file, JSON.stringify(packageJSON, null, indent)
-       );
+      fs.writeFileSync(file, JSON.stringify(packageJSON, null, indent));
 
       logSuccess(`Installed package ${packageName}@${packageVersion}`);
-     } else {
+    } else {
       logError('Unable to find package.json for the project');
     }
-  } catch(err) {
-    if (err.name === 'PackageNotFoundError')  {
+  } catch (err) {
+    if (err.name === 'PackageNotFoundError') {
       logError(`Unable to find package ${package} in the npm registry`);
     } else {
       logError(`Unable to install package ${package}: ${err}`);

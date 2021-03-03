@@ -8,9 +8,9 @@ const createProject = require('../src/commands/create-project');
 const installPackage = require('../src/commands/install-package');
 const startDevServer = require('../src/commands/start-dev-server');
 const cloneSandbox = require('../src/commands/clone-sandbox');
-const removePackage = require("../src/commands/remove-package");
-const exportSandbox = require("../src/commands/export-sandbox");
-const { TEMPLATES } = require("../src/constants");
+const removePackage = require('../src/commands/remove-package');
+const exportSandbox = require('../src/commands/export-sandbox');
+const { TEMPLATES } = require('../src/constants');
 const pkg = require('../package.json');
 const { logError, logInfo, logHelp } = require('../src/utils');
 
@@ -24,7 +24,7 @@ const command = args._[0];
 const directory = args._[1] || process.cwd();
 const DEFAULT_PORT = 3000;
 const PORT = args.port || DEFAULT_PORT;
-const BROWSER = args.browser || "";
+const BROWSER = args.browser || '';
 
 function validateNewProject(projectName, template) {
   if (!projectName) {
@@ -39,7 +39,7 @@ function validateNewProject(projectName, template) {
     process.exit(1);
   }
 
-  const availableTemplates = Object.keys(TEMPLATES).join(", ");
+  const availableTemplates = Object.keys(TEMPLATES).join(', ');
 
   if (template && !TEMPLATES[template]) {
     logError(
@@ -60,16 +60,18 @@ function validateNewProject(projectName, template) {
         unselected: '  ',
         valueRenderer: (value, selected) => {
           if (selected) {
-              return blue(underline(value));
+            return blue(underline(value));
           }
-   
+
           return value;
         },
-      }).then(answer => {
-        logInfo(`🔨 Creating ${answer.value} based project...`);
+      })
+        .then((answer) => {
+          logInfo(`🔨 Creating ${answer.value} based project...`);
 
-        resolve(TEMPLATES[answer.value])
-      }).catch(() => resolve(null));
+          resolve(TEMPLATES[answer.value]);
+        })
+        .catch(() => resolve(null));
     } else {
       resolve(TEMPLATES[template]);
     }
@@ -87,8 +89,8 @@ if (args.version) {
   }
 
   switch (command) {
-    case "add":
-    case "install": {
+    case 'add':
+    case 'install': {
       const package = args._[1];
 
       if (!package) {
@@ -100,8 +102,8 @@ if (args.version) {
       installPackage(package);
       break;
     }
-    case "uninstall":
-    case "remove": {
+    case 'uninstall':
+    case 'remove': {
       const package = args._[1];
 
       if (!package) {
@@ -113,11 +115,11 @@ if (args.version) {
       removePackage(package);
       break;
     }
-    case "create": {
+    case 'create': {
       const projectName = args._[1];
       const template = args.template;
 
-      validateNewProject(projectName, template).then(templateId => {
+      validateNewProject(projectName, template).then((templateId) => {
         if (templateId) {
           createProject({
             projectName,
@@ -127,15 +129,19 @@ if (args.version) {
           });
         }
       });
- 
-      break;
-    }
-    case "start": {
-      startDevServer({ directory, port: PORT, openInBrowser: BROWSER.toLowerCase() !== 'none' });
 
       break;
     }
-    case "export": {
+    case 'start': {
+      startDevServer({
+        directory,
+        port: PORT,
+        openInBrowser: BROWSER.toLowerCase() !== 'none',
+      });
+
+      break;
+    }
+    case 'export': {
       const directory = args._[1] || process.cwd();
       const openInBrowser = args.open;
 
@@ -143,7 +149,7 @@ if (args.version) {
 
       break;
     }
-    case "clone": {
+    case 'clone': {
       const potentialSandboxIdentifier = args._[1];
 
       if (!potentialSandboxIdentifier) {
@@ -163,10 +169,10 @@ if (args.version) {
         if (potentialSandboxId) {
           sandboxId = potentialSandboxId;
         } else {
-          logError("Please make sure the URL is correct");
+          logError('Please make sure the URL is correct');
           process.exit(1);
         }
-      } catch(e) {
+      } catch (e) {
         /**
          * Argument passed is not URL so we suppose it to be id.
          * If it is invalid Sandbox API will throw error
