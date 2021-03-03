@@ -4,7 +4,7 @@ const {
   logSuccess,
   getSandboxFiles,
   createSandboxFiles,
-} = require("../../utils");
+} = require('../../utils');
 const startDevServer = require('../start-dev-server');
 const path = require('path');
 
@@ -12,12 +12,12 @@ async function createProject({ projectName, templateId, startServer, port }) {
   try {
     const projectPath = path.join(process.cwd(), projectName);
 
-    logInfo(`📥 Downloading template...`); 
+    logInfo(`📥 Downloading template...`);
     const res = await getSandboxFiles(templateId);
-    logInfo("📁 Creating files & directories");
+    logInfo('📁 Creating files & directories');
     await createSandboxFiles(res.data, projectName);
-    logSuccess("✅ Project created");
-    
+    logSuccess('✅ Project created');
+
     if (startServer) {
       logInfo(`🚀 Starting project ${projectName}...`);
       startDevServer({ directory: projectPath, port });

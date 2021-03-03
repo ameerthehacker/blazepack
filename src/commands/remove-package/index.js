@@ -1,5 +1,5 @@
-const fs = require("fs");
-const { logError, logSuccess, getPackageJSON } = require("../../utils");
+const fs = require('fs');
+const { logError, logSuccess, getPackageJSON } = require('../../utils');
 
 async function removePackage(packageName) {
   try {
@@ -20,7 +20,7 @@ async function removePackage(packageName) {
 
       logSuccess(`Removed package ${packageName}`);
     } else {
-      logError("Unable to find package.json for the project");
+      logError('Unable to find package.json for the project');
     }
   } catch (err) {
     logError(`Unable to remove package ${package}: ${err}`);

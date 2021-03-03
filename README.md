@@ -22,12 +22,12 @@ I always wanted the super fast feedback that codesandbox provides in my local en
 
 ## Why Blazepack?
 
-* It is blazing fast ⚡
-* Super tiny (24kb) 👌
-* Run projects without npm install 💃
-* React fast refresh ❤️
-* Supports React, Vue, Angular, Preact, Svelte and more 🔨
-* Save disk space 💾
+- It is blazing fast ⚡
+- Super tiny (24kb) 👌
+- Run projects without npm install 💃
+- React fast refresh ❤️
+- Supports React, Vue, Angular, Preact, Svelte and more 🔨
+- Save disk space 💾
 
 ## Install
 
@@ -36,7 +36,6 @@ Install it globally
 ```
 npm i -g blazepack
 ```
-
 
 ## Usage
 
@@ -100,11 +99,10 @@ You can install a new package pretty fast using the below command. It does not c
 ```
 blazepack install redux
 
-# or 
+# or
 
 blazepack add redux
 ```
-
 
 ### Remove dependency
 
@@ -113,7 +111,7 @@ You can quickly remove a unused dependency by running following command:
 ```
 blazepack remove redux
 
-# or 
+# or
 
 blazepack uninstall redux
 ```
@@ -128,7 +126,7 @@ blazepack --version
 
 ### Clone Sandbox
 
-You can clone an existing codesandox, by just running the below commands: 
+You can clone an existing codesandox, by just running the below commands:
 
 **Clone from URL**
 

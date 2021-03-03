@@ -12,7 +12,7 @@ const {
   getExtension,
   readSandboxFromFS,
   getPosixPath,
-  detectTemplate
+  detectTemplate,
 } = require('../../utils');
 const { blue, underline } = require('chalk');
 
@@ -35,14 +35,14 @@ function startDevServer({ directory, port, openInBrowser = true }) {
     const assetPath = path.join(WWW_PATH, url);
 
     return fs.existsSync(assetPath);
-  }
+  };
   const sendIndexHTML = (res) => {
     const indexHTMLContent = fs.readFileSync(INDEX_HTML_PATH, 'utf-8');
 
     res.write(indexHTMLContent);
     res.end();
-  }
- 
+  };
+
   const localSandpackServer = (req, res) => {
     const filename = path.basename(req.url);
     const ext = getExtension(filename);
@@ -56,8 +56,7 @@ function startDevServer({ directory, port, openInBrowser = true }) {
       res.end();
 
       return;
-    }
-    else if (req.url === '/') {
+    } else if (req.url === '/') {
       sendIndexHTML(res);
     } else if (req.url === '/index.js') {
       const clientJSPath = path.join(ROOT_DIR, 'lib', 'index.js');
@@ -93,10 +92,10 @@ function startDevServer({ directory, port, openInBrowser = true }) {
       res.end();
 
       return;
-    } 
+    }
 
     let url;
-    const hostedSandboxAssetExtensions = ["js", "html", "css", "json", "map"];
+    const hostedSandboxAssetExtensions = ['js', 'html', 'css', 'json', 'map'];
 
     const filename = path.basename(req.url);
     const ext = getExtension(filename);
@@ -106,7 +105,7 @@ function startDevServer({ directory, port, openInBrowser = true }) {
      * if / is requested or if the resource does not have an extension always return index.html
      */
     if (req.url === '/' || !ext) {
-      url = "/index.html";
+      url = '/index.html';
     } else {
       url = req.url;
     }
@@ -118,22 +117,24 @@ function startDevServer({ directory, port, openInBrowser = true }) {
        * and bundling files.
        */
       const options = {
-        hostname: "www.unpkg.com",
+        hostname: 'www.unpkg.com',
         path: `/blazepack-core@0.0.2/www${url}`,
         method: req.method,
       };
 
       const proxyReq = https.request(options, function (proxyRes) {
-        let body = "";
+        let body = '';
 
-        proxyRes.on("data", function (chunk) {
+        proxyRes.on('data', function (chunk) {
           body += chunk;
         });
 
-        proxyRes.on("end", function () {
+        proxyRes.on('end', function () {
           const statusCode = proxyRes.statusCode;
           const shouldCache = statusCode === 200 && url !== '/index.html';
-          const headers = shouldCache? proxyRes.headers: {...proxyRes.headers, 'cache-control': 'no-cache'};
+          const headers = shouldCache
+            ? proxyRes.headers
+            : { ...proxyRes.headers, 'cache-control': 'no-cache' };
 
           res.writeHead(statusCode, headers);
           res.end(body);
@@ -141,16 +142,18 @@ function startDevServer({ directory, port, openInBrowser = true }) {
       });
       proxyReq.end();
     } else {
-      /** 
+      /**
        * This will work for svgs, or any other assets not hosted by sandpack.
        */
-      const mimeType =  MIME_TYPES[ext];
+      const mimeType = MIME_TYPES[ext];
 
       if (!mimeType) {
-        logError("We don't support this file extension. Please create an issue to add the support for the file.");
+        logError(
+          "We don't support this file extension. Please create an issue to add the support for the file."
+        );
       }
 
-      res.setHeader("Content-Type", mimeType || "text/plain");
+      res.setHeader('Content-Type', mimeType || 'text/plain');
 
       const assetPath = path.join(directory, req.url);
 
@@ -165,16 +168,20 @@ function startDevServer({ directory, port, openInBrowser = true }) {
     }
   };
 
-  const httpServer = http.createServer(isSandpackAvailableLocally ? localSandpackServer : selfHostedSandpackServer);
+  const httpServer = http.createServer(
+    isSandpackAvailableLocally ? localSandpackServer : selfHostedSandpackServer
+  );
   const wsServer = new WebSocket.Server({ server: httpServer });
 
   wsServer.on('connection', (ws) => {
     sandboxFiles = readSandboxFromFS(directory);
 
-    ws.send(JSON.stringify({
-      type: WS_EVENTS.INIT,
-      data: sandboxFiles
-    }));
+    ws.send(
+      JSON.stringify({
+        type: WS_EVENTS.INIT,
+        data: sandboxFiles,
+      })
+    );
 
     ws.on('message', (evt) => {
       const { type, data } = JSON.parse(evt);
@@ -191,7 +198,7 @@ function startDevServer({ directory, port, openInBrowser = true }) {
           logError(title);
           logError(message);
 
-          logInfo("Terminating the server");
+          logInfo('Terminating the server');
           httpServer.close();
           process.exit(1);
         }
@@ -199,32 +206,36 @@ function startDevServer({ directory, port, openInBrowser = true }) {
     });
   });
 
-
   httpServer.listen(port, () => {
-    chokidar.watch(directory, { ignoreInitial: true })
+    chokidar
+      .watch(directory, { ignoreInitial: true })
       .on('ready', () => {
         const devServerURL = blue(underline(`http://localhost:${port}`));
 
         console.log(`⚡ Blazepack dev server running at ${devServerURL}`);
-        if(openInBrowser) openBrowser(`http://localhost:${port}`);
+        if (openInBrowser) openBrowser(`http://localhost:${port}`);
       })
       .on('all', (event, filePath) => {
-        const relativePath = `/${getPosixPath(path.relative(directory, filePath))}`;
+        const relativePath = `/${getPosixPath(
+          path.relative(directory, filePath)
+        )}`;
         let fileContent;
 
         if (event !== 'unlink' && event !== 'unlinkDir' && event !== 'addDir') {
           fileContent = fs.readFileSync(filePath, 'utf-8');
         }
 
-        wsServer.clients.forEach(client => {
-          client.send(JSON.stringify({
-            type: WS_EVENTS.PATCH,
-            data: {
-              event,
-              path: relativePath,
-              fileContent
-            }
-          }));
+        wsServer.clients.forEach((client) => {
+          client.send(
+            JSON.stringify({
+              type: WS_EVENTS.PATCH,
+              data: {
+                event,
+                path: relativePath,
+                fileContent,
+              },
+            })
+          );
         });
       });
   });
@@ -232,9 +243,13 @@ function startDevServer({ directory, port, openInBrowser = true }) {
   if (process.env.NODE_ENV !== 'development') {
     process.on('uncaughtException', (err) => {
       if (err.errno === 'EADDRINUSE') {
-        logError(`😢 Unable to start blazepack dev server, port ${port} is already in use`);
+        logError(
+          `😢 Unable to start blazepack dev server, port ${port} is already in use`
+        );
       } else {
-        logError(`😢 Unexpected error occured in the dev server: ${err.message}`);
+        logError(
+          `😢 Unexpected error occured in the dev server: ${err.message}`
+        );
       }
     });
   }
