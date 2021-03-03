@@ -12,3 +12,6 @@ jest-puppeteer.config.js
 .github
 jest.config.json
 .all-contributorsrc
+.husky
+.prettierignore
+.prettierrc
