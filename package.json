@@ -8,6 +8,7 @@
   },
   "scripts": {
     "e2e": "jest e2e --forceExit",
+    "e2e:ci": "jest e2e --forceExit --runInBand",
     "test": "jest src",
     "test:watch": "jest src --watch",
     "build-client": "parcel build src/client/index.js --out-dir src/lib",
