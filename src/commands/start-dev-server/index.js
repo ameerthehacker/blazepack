@@ -6,6 +6,7 @@ const WebSocket = require('ws');
 const { WS_EVENTS, MIME_TYPES } = require('../../constants');
 const chokidar = require('chokidar');
 const openBrowser = require('../../open-browser');
+const Stream = require('stream').Transform;
 const {
   logError,
   logInfo,
@@ -15,6 +16,7 @@ const {
   detectTemplate,
 } = require('../../utils');
 const { blue, underline } = require('chalk');
+const { getRegistries } = require('../../npm/utils');
 
 let sandboxFiles;
 
@@ -31,6 +33,7 @@ function startDevServer({ directory, port, openInBrowser = true }) {
   const WWW_PATH = path.join(ROOT_DIR, 'client', 'www');
   const INDEX_HTML_PATH = path.join(WWW_PATH, 'index.html');
   const isSandpackAvailableLocally = process.env.SANDPACK_LOCAL;
+  const npmRegistries = getRegistries(directory);
   const assetExistsInStaticPath = (url) => {
     const assetPath = path.join(WWW_PATH, url);
 
@@ -80,6 +83,73 @@ function startDevServer({ directory, port, openInBrowser = true }) {
   };
 
   const selfHostedSandpackServer = (req, res) => {
+    // handle private npm registries
+    if (req.url.startsWith('/npm')) {
+      const { 2: package } = req.url.split('/');
+      const proxyURL = req.url.split('/').slice(2).join('/');
+      const [scope] = package.split('%2f');
+      const registryConfig = npmRegistries.find((npmRegistry) =>
+        npmRegistry.scopes.includes(scope.substring(1))
+      );
+      const registryURL = new URL(registryConfig.registry);
+
+      /**
+       * Proxy all requests to private npm registry.
+       */
+
+      if (!proxyURL.endsWith('/1.0.0')) {
+        const options = {
+          hostname: registryURL.hostname,
+          path: `/${proxyURL}`,
+          method: req.method,
+          port: registryURL.port,
+          headers: {
+            Authorization: `Bearer ${registryConfig.token}`,
+          },
+        };
+
+        const proxyReq = http.request(options, function (proxyRes) {
+          let body = '';
+
+          proxyRes.on('data', function (chunk) {
+            body += chunk;
+          });
+
+          proxyRes.on('end', function () {
+            res.writeHead(proxyRes.statusCode, proxyRes.headers);
+            res.end(body);
+          });
+        });
+        proxyReq.end();
+      } else {
+        const options = {
+          hostname: registryURL.hostname,
+          path: `/@myorg%2fprivate-repo-test/-/private-repo-test-1.0.0.tgz`,
+          method: req.method,
+          port: registryURL.port,
+          headers: {
+            Authorization: `Bearer ${registryConfig.token}`,
+          },
+        };
+
+        const proxyReq = http.request(options, function (proxyRes) {
+          let body = new Stream();
+
+          proxyRes.on('data', function (chunk) {
+            body.push(chunk);
+          });
+
+          proxyRes.on('end', function () {
+            res.writeHead(proxyRes.statusCode, proxyRes.headers);
+            res.end(body.read());
+          });
+        });
+        proxyReq.end();
+      }
+
+      return;
+    }
+
     /**
      * Serve client/index.js for updating on websockets events.
      */

@@ -7,6 +7,13 @@ const getTemplateDefinition = window.getTemplateDefinition;
 const info = (message) => console.log(`${name}: ${message}`);
 const ws = new WebSocket(`ws://${window.location.host}`);
 let sandboxFiles;
+const customNpmRegistries = [
+  {
+    enabledScopes: ['@myorg'],
+    limitToScopes: true,
+    registryUrl: `${window.location.origin}/npm`,
+  },
+];
 
 ws.onopen = () => info('connected');
 
@@ -72,6 +79,7 @@ ws.onmessage = (evt) => {
           externalResources: [],
           template: getSandboxTemplateName(sandboxFiles),
           isInitializationCompile: true,
+          customNpmRegistries,
         });
 
         break;
@@ -100,6 +108,7 @@ ws.onmessage = (evt) => {
           codesandbox: true,
           externalResources: [],
           template: getSandboxTemplateName(updatedFiles),
+          customNpmRegistries,
         });
 
         break;

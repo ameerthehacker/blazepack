@@ -29,23 +29,33 @@ function getRegistries(directory) {
   const npmrc = parseNpmrc(directory);
   const registries = [];
 
-  for(const config in npmrc) {
-    if ((/@(.*):registry/gi).test(config)) {
+  for (const config in npmrc) {
+    if (/@(.*):registry/gi.test(config)) {
       const scope = matchAll(config, /@(.*):registry/gi).toArray()[0];
-
-      registries.push({
-        scope,
-        registry: npmrc[config]
+      const registryConfig = registries.find((rConfig) => {
+        return rConfig.registry === npmrc[config];
       });
+
+      if (registryConfig) {
+        registryConfig.scopes.push(scope);
+      } else {
+        registries.push({
+          scopes: [scope],
+          registry: npmrc[config],
+        });
+      }
     } else if (config === 'registry') {
       registries.push({
-        scope: '',
-        registry: npmrc[config]
+        scopes: [],
+        registry: npmrc[config],
       });
-    } else if ((/\/\/(.*)\/:(_authToken|_auth)/gi).test(config)) {
-      const registry = matchAll(config,  /\/\/(.*)\/:(_authToken|_auth)/gi).toArray()[0];
-      const registryConfig = registries.find(config => {
-        const registryURL = new URL(config.registry);
+    } else if (/\/\/(.*)\/:(_authToken|_auth)/gi.test(config)) {
+      const registry = matchAll(
+        config,
+        /\/\/(.*)\/:(_authToken|_auth)/gi
+      ).toArray()[0];
+      const registryConfig = registries.find((rConfig) => {
+        const registryURL = new URL(rConfig.registry);
 
         return registryURL.host === registry;
       });
@@ -60,5 +70,5 @@ function getRegistries(directory) {
 }
 
 module.exports = {
-  getRegistries
+  getRegistries,
 };
