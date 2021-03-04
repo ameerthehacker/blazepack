@@ -4,6 +4,7 @@ const ini = require('ini');
 const npmConf = require('npm-conf')();
 const matchAll = require('match-all');
 const request = require('../request');
+const { getProjectRoot } = require('../utils');
 
 const GLOBAL_CONFIG = npmConf.get('globalconfig');
 const USER_CONFIG = npmConf.get('userconfig');
@@ -70,9 +71,10 @@ function getRegistries(directory) {
   return registries;
 }
 
-function getLatestVersion(packageName) {
+function getLatestVersion(packageName, directory = process.cwd()) {
   let npmRegistryURL = 'https://registry.npmjs.org';
-  const registries = getRegistries(process.cwd());
+  const projectRoot = getProjectRoot(directory);
+  const registries = getRegistries(projectRoot || directory);
   const [scope] = packageName.split('/');
   const registryConfig = registries.find((rConfig) =>
     rConfig.scopes.includes(scope)

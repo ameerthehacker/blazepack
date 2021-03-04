@@ -12,7 +12,7 @@ const removePackage = require('../src/commands/remove-package');
 const exportSandbox = require('../src/commands/export-sandbox');
 const { TEMPLATES } = require('../src/constants');
 const pkg = require('../package.json');
-const { logError, logInfo, logHelp } = require('../src/utils');
+const { logError, logInfo, logHelp, getProjectRoot } = require('../src/utils');
 
 // Checking for available updates
 const notifier = updateNotifier({ pkg });
@@ -133,8 +133,10 @@ if (args.version) {
       break;
     }
     case 'start': {
+      const projectRoot = getProjectRoot(directory);
+
       startDevServer({
-        directory,
+        directory: projectRoot || directory,
         port: PORT,
         openInBrowser: BROWSER.toLowerCase() !== 'none',
       });
