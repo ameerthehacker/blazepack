@@ -25,6 +25,7 @@ I always wanted the super fast feedback that codesandbox provides in my local en
 - It is blazing fast ⚡
 - Super tiny (24kb) 👌
 - Run projects without npm install 💃
+- Supports private npm packages 😉
 - React fast refresh ❤️
 - Supports React, Vue, Angular, Preact, Svelte and more 🔨
 - Save disk space 💾
@@ -156,6 +157,15 @@ blazepack export
 # use --open option to also open the newly created sandbox in a browser tab
 
 blazepack export --open
+```
+
+### Private npm packages
+
+We honour the project level `.npmrc` file and if it is not found we fallback to user level `.npmrc` file and then finally the global `.npmrc` file. Currently we only support scoped private npm packages. To use the scoped private npm packages you need to fist login into the npm registry and add the scope config to `.npmrc`
+
+```ini
+@myorg:registry=https://registry.myorg.com
+//registry.myorg.com/:_authToken=secrettoken
 ```
 
 ### Help

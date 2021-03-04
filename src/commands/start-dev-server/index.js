@@ -6,6 +6,7 @@ const WebSocket = require('ws');
 const { WS_EVENTS, MIME_TYPES } = require('../../constants');
 const chokidar = require('chokidar');
 const openBrowser = require('../../open-browser');
+const Stream = require('stream').Transform;
 const {
   logError,
   logInfo,
@@ -15,6 +16,9 @@ const {
   detectTemplate,
 } = require('../../utils');
 const { blue, underline } = require('chalk');
+const npm = require('../../npm');
+const request = require('../../request');
+const matchAll = require('match-all');
 
 let sandboxFiles;
 
@@ -31,6 +35,7 @@ function startDevServer({ directory, port, openInBrowser = true }) {
   const WWW_PATH = path.join(ROOT_DIR, 'client', 'www');
   const INDEX_HTML_PATH = path.join(WWW_PATH, 'index.html');
   const isSandpackAvailableLocally = process.env.SANDPACK_LOCAL;
+  const npmRegistries = npm.getRegistries(directory);
   const assetExistsInStaticPath = (url) => {
     const assetPath = path.join(WWW_PATH, url);
 
@@ -43,7 +48,99 @@ function startDevServer({ directory, port, openInBrowser = true }) {
     res.end();
   };
 
-  const localSandpackServer = (req, res) => {
+  /**
+   * when sandpack finds scoped private npm packages it would hit our local server
+   * with /npm/@myorg%2fpackage
+   * we will proxy that to private npm registry with secret token we got from .npmrc file
+   * when sandpack hits as with /npm/@myorg%2fpackage/version
+   * we will download the tarball from the private npm registry and provide it to sandbpack
+   * none of the private package files leave the user's computer
+   */
+  const handlePrivateNpmPackages = async (req, res) => {
+    const [package, version] = matchAll(req.url, /^\/npm\/(.*)/gi)
+      .toArray()[0]
+      .split('/');
+    const [scope] = package.split('%2f');
+    const registryConfig = npmRegistries.find((npmRegistry) =>
+      npmRegistry.scopes.includes(scope)
+    );
+
+    // we could not find that registry in npm
+    if (!registryConfig) {
+      res.writeHead(404);
+      res.end();
+
+      return;
+    }
+
+    const registryURL = registryConfig.registry;
+
+    if (/^\/npm\/(.*)\/(.*)$/.test(req.url)) {
+      try {
+        const { body: packageInfo } = await request.get(
+          `${registryURL}/${package}/${version}`,
+          {
+            Authorization: `Bearer ${registryConfig.token}`,
+          }
+        );
+
+        const tarballURL = JSON.parse(packageInfo).dist.tarball;
+
+        const { body: packageTar, response: registryRes } = await request.get(
+          tarballURL,
+          {
+            Authorization: `Bearer ${registryConfig.token}`,
+          }
+        );
+
+        if (registryRes.statusCode === 200) {
+          res.writeHead(registryRes.statusCode, registryRes.headers);
+          res.end(packageTar);
+        } else {
+          res.writeHead(404, registryRes.headers);
+          res.end();
+        }
+      } catch (err) {
+        res.writeHead(404);
+        res.end();
+
+        logError(
+          `Unable to download tarball of npm package ${package}@${version}: ${err}`
+        );
+      }
+    } else if (/^\/npm\/(.*)$/.test(req.url)) {
+      try {
+        const { body: packageInfo, response: registryRes } = await request.get(
+          `${registryURL}/${package}`,
+          {
+            Authorization: `Bearer ${registryConfig.token}`,
+          }
+        );
+
+        if (registryRes.statusCode === 200) {
+          res.writeHead(registryRes.statusCode, registryRes.headers);
+          res.end(packageInfo);
+        } else {
+          res.writeHead(404, registryRes.headers);
+          res.end();
+        }
+      } catch (err) {
+        res.writeHead(404);
+        res.end();
+
+        logError(`Unable to fetch package info of ${package}: ${err}`);
+      }
+    }
+  };
+
+  const localSandpackServer = async (req, res) => {
+    // handle private npm registries
+    if (/^\/npm\/(.*)/gi.test(req.url)) {
+      handlePrivateNpmPackages(req, res);
+
+      return;
+    }
+
     const filename = path.basename(req.url);
     const ext = getExtension(filename);
     const isSvg = ext === 'svg';
@@ -79,7 +176,14 @@ function startDevServer({ directory, port, openInBrowser = true }) {
     }
   };
 
-  const selfHostedSandpackServer = (req, res) => {
+  const selfHostedSandpackServer = async (req, res) => {
+    // handle private npm registries
+    if (/^\/npm\/(.*)/gi.test(req.url)) {
+      handlePrivateNpmPackages(req, res);
+
+      return;
+    }
+
     /**
      * Serve client/index.js for updating on websockets events.
      */
@@ -123,10 +227,10 @@ function startDevServer({ directory, port, openInBrowser = true }) {
       };
 
       const proxyReq = https.request(options, function (proxyRes) {
-        let body = '';
+        let body = new Stream();
 
         proxyRes.on('data', function (chunk) {
-          body += chunk;
+          body.push(chunk);
         });
 
         proxyRes.on('end', function () {
@@ -137,7 +241,7 @@ function startDevServer({ directory, port, openInBrowser = true }) {
             : { ...proxyRes.headers, 'cache-control': 'no-cache' };
 
           res.writeHead(statusCode, headers);
-          res.end(body);
+          res.end(body.read());
         });
       });
       proxyReq.end();
@@ -179,7 +283,12 @@ function startDevServer({ directory, port, openInBrowser = true }) {
     ws.send(
       JSON.stringify({
         type: WS_EVENTS.INIT,
-        data: sandboxFiles,
+        data: {
+          files: sandboxFiles,
+          registryScopes: npmRegistries.map(
+            (npmRegistry) => npmRegistry.scopes
+          ),
+        },
       })
     );
 

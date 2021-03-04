@@ -285,7 +285,7 @@ async function createSandboxFiles(sandboxInfo, projectName) {
   });
 }
 
-const getPackageJSON = () => {
+function getPackageJSON() {
   const iterator = findPackageJSON();
   const nextPackageJSON = iterator.next();
 
@@ -305,7 +305,18 @@ const getPackageJSON = () => {
   }
 
   return null;
-};
+}
+
+function getProjectRoot(directory) {
+  const iterator = findPackageJSON(directory);
+  const nextPackageJSON = iterator.next();
+
+  if (nextPackageJSON && nextPackageJSON.filename) {
+    return path.dirname(nextPackageJSON.filename);
+  }
+
+  return null;
+}
 
 function getPosixPath(filePath) {
   return filePath.split(path.sep).join(path.posix.sep);
@@ -444,4 +455,5 @@ module.exports = {
   readSandboxFromFS,
   getPosixPath,
   detectTemplate,
+  getProjectRoot,
 };

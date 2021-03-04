@@ -1,15 +1,26 @@
-const getLatestPackageVersion = require('latest-version');
+const npm = require('../../npm');
 const fs = require('fs');
 const { logError, logSuccess, getPackageJSON } = require('../../utils');
 
 async function installPackage(package) {
   try {
-    const [packageName, version] = package.split('@');
+    let packageName, version;
+
+    // package name has scope
+    if (package.startsWith('@')) {
+      [, packageName, version] = package.split('@');
+
+      // add back the @
+      packageName = `@${packageName}`;
+    } else {
+      [packageName, version] = package.split('@');
+    }
+
     const potentialJSON = getPackageJSON();
 
     if (potentialJSON) {
       const { json: packageJSON, indent, file } = potentialJSON;
-      const latestVersion = await getLatestPackageVersion(packageName);
+      const latestVersion = await npm.getLatestVersion(packageName);
       const packageVersion = version || latestVersion;
 
       if (packageJSON.dependencies) {
@@ -29,7 +40,7 @@ async function installPackage(package) {
     if (err.name === 'PackageNotFoundError') {
       logError(`Unable to find package ${package} in the npm registry`);
     } else {
-      logError(`Unable to install package ${package}: ${err}`);
+      logError(`Unable to install package ${package}: ${err.error}`);
     }
   }
 }

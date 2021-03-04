@@ -7,6 +7,7 @@ const getTemplateDefinition = window.getTemplateDefinition;
 const info = (message) => console.log(`${name}: ${message}`);
 const ws = new WebSocket(`ws://${window.location.host}`);
 let sandboxFiles;
+let customNpmRegistries = [];
 
 ws.onopen = () => info('connected');
 
@@ -46,7 +47,12 @@ ws.onmessage = (evt) => {
   try {
     switch (type) {
       case WS_EVENTS.INIT: {
-        sandboxFiles = data;
+        sandboxFiles = data.files;
+        customNpmRegistries = data.registryScopes.map((scopes) => ({
+          enabledScopes: scopes,
+          limitToScopes: true,
+          registryUrl: `${window.location.origin}/npm`,
+        }));
         const sandboxTemplate = getSandboxTemplateName(sandboxFiles);
         const sandboxTemplateDefinition = getTemplateDefinition(
           sandboxTemplate
@@ -72,6 +78,7 @@ ws.onmessage = (evt) => {
           externalResources: [],
           template: getSandboxTemplateName(sandboxFiles),
           isInitializationCompile: true,
+          customNpmRegistries,
         });
 
         break;
@@ -100,6 +107,7 @@ ws.onmessage = (evt) => {
           codesandbox: true,
           externalResources: [],
           template: getSandboxTemplateName(updatedFiles),
+          customNpmRegistries,
         });
 
         break;
