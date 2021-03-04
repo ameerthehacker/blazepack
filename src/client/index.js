@@ -7,13 +7,7 @@ const getTemplateDefinition = window.getTemplateDefinition;
 const info = (message) => console.log(`${name}: ${message}`);
 const ws = new WebSocket(`ws://${window.location.host}`);
 let sandboxFiles;
-const customNpmRegistries = [
-  {
-    enabledScopes: ['@myorg'],
-    limitToScopes: true,
-    registryUrl: `${window.location.origin}/npm`,
-  },
-];
+let customNpmRegistries = [];
 
 ws.onopen = () => info('connected');
 
@@ -53,7 +47,12 @@ ws.onmessage = (evt) => {
   try {
     switch (type) {
       case WS_EVENTS.INIT: {
-        sandboxFiles = data;
+        sandboxFiles = data.files;
+        customNpmRegistries = data.registryScopes.map((scopes) => ({
+          enabledScopes: scopes,
+          limitToScopes: true,
+          registryUrl: `${window.location.origin}/npm`,
+        }));
         const sandboxTemplate = getSandboxTemplateName(sandboxFiles);
         const sandboxTemplateDefinition = getTemplateDefinition(
           sandboxTemplate

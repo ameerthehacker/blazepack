@@ -248,7 +248,12 @@ function startDevServer({ directory, port, openInBrowser = true }) {
     ws.send(
       JSON.stringify({
         type: WS_EVENTS.INIT,
-        data: sandboxFiles,
+        data: {
+          files: sandboxFiles,
+          registryScopes: npmRegistries.map(
+            (npmRegistry) => npmRegistry.scopes
+          ),
+        },
       })
     );
 
