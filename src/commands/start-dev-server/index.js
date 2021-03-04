@@ -106,43 +106,59 @@ function startDevServer({ directory, port, openInBrowser = true }) {
       const registryURL = registryConfig.registry;
 
       if (/^\/npm\/(.*)\/(.*)$/.test(req.url)) {
-        const { body: packageInfo } = await request.get(
-          `${registryURL}/${package}/${version}`,
-          {
-            Authorization: `Bearer ${registryConfig.token}`,
+        try {
+          const { body: packageInfo } = await request.get(
+            `${registryURL}/${package}/${version}`,
+            {
+              Authorization: `Bearer ${registryConfig.token}`,
+            }
+          );
+
+          const tarballURL = JSON.parse(packageInfo).dist.tarball;
+
+          const { body: packageTar, response: registryRes } = await request.get(
+            tarballURL,
+            {
+              Authorization: `Bearer ${registryConfig.token}`,
+            }
+          );
+
+          if (registryRes.statusCode === 200) {
+            res.writeHead(registryRes.statusCode, registryRes.headers);
+            res.end(packageTar);
+          } else {
+            res.writeHead(404, registryRes.headers);
+            res.end();
           }
-        );
-
-        const tarballURL = JSON.parse(packageInfo).dist.tarball;
-
-        const { body: packageTar, response: registryRes } = await request.get(
-          tarballURL,
-          {
-            Authorization: `Bearer ${registryConfig.token}`,
-          }
-        );
-
-        if (registryRes.statusCode === 200) {
-          res.writeHead(registryRes.statusCode, registryRes.headers);
-          res.end(packageTar);
-        } else {
-          res.writeHead(404, registryRes.headers);
+        } catch (err) {
+          res.writeHead(404);
           res.end();
+
+          logError(
+            `Unable to download tarball of npm package ${package}@${version}: ${err}`
+          );
         }
       } else if (/^\/npm\/(.*)$/.test(req.url)) {
-        const { body: packageInfo, response: registryRes } = await request.get(
-          `${registryURL}/${package}`,
-          {
+        try {
+          const {
+            body: packageInfo,
+            response: registryRes,
+          } = await request.get(`${registryURL}/${package}`, {
             Authorization: `Bearer ${registryConfig.token}`,
-          }
-        );
+          });
 
-        if (registryRes.statusCode === 200) {
-          res.writeHead(registryRes.statusCode, registryRes.headers);
-          res.end(packageInfo);
-        } else {
-          res.writeHead(404, registryRes.headers);
+          if (registryRes.statusCode === 200) {
+            res.writeHead(registryRes.statusCode, registryRes.headers);
+            res.end(packageInfo);
+          } else {
+            res.writeHead(404, registryRes.headers);
+            res.end();
+          }
+        } catch (err) {
+          res.writeHead(404);
           res.end();
+
+          logError(`Unable to fetch package info of ${package}: ${err}`);
         }
       }
 

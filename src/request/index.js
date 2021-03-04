@@ -19,7 +19,7 @@ function get(url, headers) {
     headers,
   };
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const req = httpOrHttps.request(options, (res) => {
       let data = new Stream();
 
@@ -28,7 +28,11 @@ function get(url, headers) {
       res.on('end', () => {
         resolve({ body: data.read(), response: res });
       });
+
+      res.on('error', reject);
     });
+
+    req.on('error', reject);
 
     req.end();
   });
