@@ -9,7 +9,7 @@ const getAllFiles = require('get-all-files').default;
 const { TEMPLATES } = require('../constants');
 
 function logError(message) {
-  console.error(red(message));
+  console.error(`❌ ${red(message)}`);
 }
 
 function logSuccess(message) {
@@ -266,23 +266,27 @@ async function createSandboxFiles(sandboxInfo, projectName) {
   /**
    * Create all files, with the code.
    */
-  sandboxInfo.modules.forEach(async (module) => {
+  for (const module of sandboxInfo.modules) {
     // if it is a image we need to download it from codesandbox locally
     if (isImage(module.title)) {
-      module.code = await downloadImage(module.code);
+      try {
+        module.code = await downloadImage(module.code);
+      } catch (err) {
+        logError(`${module.title}: ${err}`);
+      }
     }
 
     if (module.directory_shortid) {
-      await fs.writeFileSync(
+      fs.writeFileSync(
         `${projectPath}/${directoriesWithPath[module.directory_shortid]}${
           module.title
         }`,
         module.code
       );
     } else {
-      await fs.writeFileSync(`${projectPath}/${module.title}`, module.code);
+      fs.writeFileSync(`${projectPath}/${module.title}`, module.code);
     }
-  });
+  }
 }
 
 function getPackageJSON() {

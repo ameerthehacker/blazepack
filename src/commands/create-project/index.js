@@ -23,7 +23,7 @@ async function createProject({ projectName, templateId, startServer, port }) {
       startDevServer({ directory: projectPath, port });
     }
   } catch (err) {
-    logError(`😢 Unable to create new project: ${err}`);
+    logError(`Unable to create new project: ${err}`);
   }
 }
 

@@ -13,7 +13,7 @@ function exportSandbox({ directory, openInBrowser }) {
     files: sandboxFiles,
   });
 
-  logInfo(`📡  Sending files to codesandbox.io`);
+  logInfo(`📡 Sending files to codesandbox.io`);
 
   const req = https.request(
     {

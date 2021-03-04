@@ -26,7 +26,7 @@ function startDevServer({ directory, port, openInBrowser = true }) {
   try {
     detectTemplate(directory);
   } catch (err) {
-    logError(`😢 ${err}`);
+    logError(err);
 
     process.exit(1);
   }
@@ -353,12 +353,10 @@ function startDevServer({ directory, port, openInBrowser = true }) {
     process.on('uncaughtException', (err) => {
       if (err.errno === 'EADDRINUSE') {
         logError(
-          `😢 Unable to start blazepack dev server, port ${port} is already in use`
+          `Unable to start blazepack dev server, port ${port} is already in use`
         );
       } else {
-        logError(
-          `😢 Unexpected error occured in the dev server: ${err.message}`
-        );
+        logError(`Unexpected error occured in the dev server: ${err.message}`);
       }
     });
   }

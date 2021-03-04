@@ -14,7 +14,7 @@ async function cloneSandbox({ id }) {
     await createSandboxFiles(res.data);
     logSuccess('✅ Sandbox cloned');
   } catch (e) {
-    logError(`😢 Unable to clone sandbox: ${e}`);
+    logError(`Unable to clone sandbox: ${e}`);
   }
 }
 

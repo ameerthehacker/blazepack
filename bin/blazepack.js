@@ -34,7 +34,7 @@ function validateNewProject(projectName, template) {
   }
 
   if (fs.existsSync(projectName)) {
-    logError(`😢 Sorry a directory with name ${projectName} already exists!`);
+    logError(`Sorry a directory with name ${projectName} already exists!`);
 
     process.exit(1);
   }
