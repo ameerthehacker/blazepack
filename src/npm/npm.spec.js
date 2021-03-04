@@ -2,6 +2,11 @@ const { getRegistries } = require('./index');
 const fs = require('fs');
 const cwd = process.cwd();
 
+jest.mock('fs');
+jest.mock('npm-conf', () => () => ({
+  get: () => '',
+}));
+
 describe('npm utils', () => {
   it('should return the available registried', () => {
     fs.existsSync = jest.fn().mockReturnValue(true);
