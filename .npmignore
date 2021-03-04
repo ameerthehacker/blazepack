@@ -16,3 +16,4 @@ jest.config.json
 .prettierignore
 .prettierrc
 rollup.config.js
+LICENSE
