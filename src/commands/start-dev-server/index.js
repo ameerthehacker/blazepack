@@ -48,7 +48,99 @@ function startDevServer({ directory, port, openInBrowser = true }) {
     res.end();
   };
 
-  const localSandpackServer = (req, res) => {
+  /**
+   * when sandpack finds scoped private npm packages it would hit our local server
+   * with /npm/@myorg%2fpackage
+   * we will proxy that to private npm registry with secret token we got from .npmrc file
+   * when sandpack hits as with /npm/@myorg%2fpackage/version
+   * we will download the tarball from the private npm registry and provide it to sandbpack
+   * none of the private package files leave the user's computer
+   */
+  const handlePrivateNpmPackages = async (req, res) => {
+    const [package, version] = matchAll(req.url, /^\/npm\/(.*)/gi)
+      .toArray()[0]
+      .split('/');
+    const [scope] = package.split('%2f');
+    const registryConfig = npmRegistries.find((npmRegistry) =>
+      npmRegistry.scopes.includes(scope)
+    );
+
+    // we could not find that registry in npm
+    if (!registryConfig) {
+      res.writeHead(404);
+      res.end();
+
+      return;
+    }
+
+    const registryURL = registryConfig.registry;
+
+    if (/^\/npm\/(.*)\/(.*)$/.test(req.url)) {
+      try {
+        const { body: packageInfo } = await request.get(
+          `${registryURL}/${package}/${version}`,
+          {
+            Authorization: `Bearer ${registryConfig.token}`,
+          }
+        );
+
+        const tarballURL = JSON.parse(packageInfo).dist.tarball;
+
+        const { body: packageTar, response: registryRes } = await request.get(
+          tarballURL,
+          {
+            Authorization: `Bearer ${registryConfig.token}`,
+          }
+        );
+
+        if (registryRes.statusCode === 200) {
+          res.writeHead(registryRes.statusCode, registryRes.headers);
+          res.end(packageTar);
+        } else {
+          res.writeHead(404, registryRes.headers);
+          res.end();
+        }
+      } catch (err) {
+        res.writeHead(404);
+        res.end();
+
+        logError(
+          `Unable to download tarball of npm package ${package}@${version}: ${err}`
+        );
+      }
+    } else if (/^\/npm\/(.*)$/.test(req.url)) {
+      try {
+        const { body: packageInfo, response: registryRes } = await request.get(
+          `${registryURL}/${package}`,
+          {
+            Authorization: `Bearer ${registryConfig.token}`,
+          }
+        );
+
+        if (registryRes.statusCode === 200) {
+          res.writeHead(registryRes.statusCode, registryRes.headers);
+          res.end(packageInfo);
+        } else {
+          res.writeHead(404, registryRes.headers);
+          res.end();
+        }
+      } catch (err) {
+        res.writeHead(404);
+        res.end();
+
+        logError(`Unable to fetch package info of ${package}: ${err}`);
+      }
+    }
+  };
+
+  const localSandpackServer = async (req, res) => {
+    // handle private npm registries
+    if (/^\/npm\/(.*)/gi.test(req.url)) {
+      handlePrivateNpmPackages(req, res);
+
+      return;
+    }
+
     const filename = path.basename(req.url);
     const ext = getExtension(filename);
     const isSvg = ext === 'svg';
@@ -87,80 +179,7 @@ function startDevServer({ directory, port, openInBrowser = true }) {
   const selfHostedSandpackServer = async (req, res) => {
     // handle private npm registries
     if (/^\/npm\/(.*)/gi.test(req.url)) {
-      const [package, version] = matchAll(req.url, /^\/npm\/(.*)/gi)
-        .toArray()[0]
-        .split('/');
-      const [scope] = package.split('%2f');
-      const registryConfig = npmRegistries.find((npmRegistry) =>
-        npmRegistry.scopes.includes(scope)
-      );
-
-      // we could not find that registry in npm
-      if (!registryConfig) {
-        res.writeHead(404);
-        res.end();
-
-        return;
-      }
-
-      const registryURL = registryConfig.registry;
-
-      if (/^\/npm\/(.*)\/(.*)$/.test(req.url)) {
-        try {
-          const { body: packageInfo } = await request.get(
-            `${registryURL}/${package}/${version}`,
-            {
-              Authorization: `Bearer ${registryConfig.token}`,
-            }
-          );
-
-          const tarballURL = JSON.parse(packageInfo).dist.tarball;
-
-          const { body: packageTar, response: registryRes } = await request.get(
-            tarballURL,
-            {
-              Authorization: `Bearer ${registryConfig.token}`,
-            }
-          );
-
-          if (registryRes.statusCode === 200) {
-            res.writeHead(registryRes.statusCode, registryRes.headers);
-            res.end(packageTar);
-          } else {
-            res.writeHead(404, registryRes.headers);
-            res.end();
-          }
-        } catch (err) {
-          res.writeHead(404);
-          res.end();
-
-          logError(
-            `Unable to download tarball of npm package ${package}@${version}: ${err}`
-          );
-        }
-      } else if (/^\/npm\/(.*)$/.test(req.url)) {
-        try {
-          const {
-            body: packageInfo,
-            response: registryRes,
-          } = await request.get(`${registryURL}/${package}`, {
-            Authorization: `Bearer ${registryConfig.token}`,
-          });
-
-          if (registryRes.statusCode === 200) {
-            res.writeHead(registryRes.statusCode, registryRes.headers);
-            res.end(packageInfo);
-          } else {
-            res.writeHead(404, registryRes.headers);
-            res.end();
-          }
-        } catch (err) {
-          res.writeHead(404);
-          res.end();
-
-          logError(`Unable to fetch package info of ${package}: ${err}`);
-        }
-      }
+      handlePrivateNpmPackages(req, res);
 
       return;
     }
