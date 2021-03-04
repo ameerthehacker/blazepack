@@ -1,4 +1,4 @@
-const { getRegistries } = require('./index');
+const { getRegistries } = require('./utils/index');
 const fs = require('fs');
 const cwd = process.cwd();
 

@@ -16,7 +16,9 @@ const {
   detectTemplate,
 } = require('../../utils');
 const { blue, underline } = require('chalk');
-const { getRegistries } = require('../../npm/utils');
+const { getRegistries } = require('../../npm');
+const request = require('../../request');
+const matchAll = require('match-all');
 
 let sandboxFiles;
 
@@ -82,69 +84,66 @@ function startDevServer({ directory, port, openInBrowser = true }) {
     }
   };
 
-  const selfHostedSandpackServer = (req, res) => {
+  const selfHostedSandpackServer = async (req, res) => {
     // handle private npm registries
-    if (req.url.startsWith('/npm')) {
-      const { 2: package } = req.url.split('/');
-      const proxyURL = req.url.split('/').slice(2).join('/');
+    if (/^\/npm\/(.*)/gi.test(req.url)) {
+      const [package, version] = matchAll(req.url, /^\/npm\/(.*)/gi)
+        .toArray()[0]
+        .split('/');
       const [scope] = package.split('%2f');
       const registryConfig = npmRegistries.find((npmRegistry) =>
         npmRegistry.scopes.includes(scope.substring(1))
       );
-      const registryURL = new URL(registryConfig.registry);
 
-      /**
-       * Proxy all requests to private npm registry.
-       */
+      // we could not find that registry in npm
+      if (!registryConfig) {
+        res.writeHead(404);
+        res.end();
 
-      if (!proxyURL.endsWith('/1.0.0')) {
-        const options = {
-          hostname: registryURL.hostname,
-          path: `/${proxyURL}`,
-          method: req.method,
-          port: registryURL.port,
-          headers: {
+        return;
+      }
+
+      const registryURL = registryConfig.registry;
+
+      if (/^\/npm\/(.*)\/(.*)$/.test(req.url)) {
+        const { body: packageInfo } = await request.get(
+          `${registryURL}/${package}/${version}`,
+          {
             Authorization: `Bearer ${registryConfig.token}`,
-          },
-        };
+          }
+        );
 
-        const proxyReq = http.request(options, function (proxyRes) {
-          let body = '';
+        const tarballURL = JSON.parse(packageInfo).dist.tarball;
 
-          proxyRes.on('data', function (chunk) {
-            body += chunk;
-          });
-
-          proxyRes.on('end', function () {
-            res.writeHead(proxyRes.statusCode, proxyRes.headers);
-            res.end(body);
-          });
-        });
-        proxyReq.end();
-      } else {
-        const options = {
-          hostname: registryURL.hostname,
-          path: `/@myorg%2fprivate-repo-test/-/private-repo-test-1.0.0.tgz`,
-          method: req.method,
-          port: registryURL.port,
-          headers: {
+        const { body: packageTar, response: registryRes } = await request.get(
+          tarballURL,
+          {
             Authorization: `Bearer ${registryConfig.token}`,
-          },
-        };
+          }
+        );
 
-        const proxyReq = http.request(options, function (proxyRes) {
-          let body = new Stream();
+        if (registryRes.statusCode === 200) {
+          res.writeHead(registryRes.statusCode, registryRes.headers);
+          res.end(packageTar);
+        } else {
+          res.writeHead(404, registryRes.headers);
+          res.end();
+        }
+      } else if (/^\/npm\/(.*)$/.test(req.url)) {
+        const { body: packageInfo, response: registryRes } = await request.get(
+          `${registryURL}/${package}`,
+          {
+            Authorization: `Bearer ${registryConfig.token}`,
+          }
+        );
 
-          proxyRes.on('data', function (chunk) {
-            body.push(chunk);
-          });
-
-          proxyRes.on('end', function () {
-            res.writeHead(proxyRes.statusCode, proxyRes.headers);
-            res.end(body.read());
-          });
-        });
-        proxyReq.end();
+        if (registryRes.statusCode === 200) {
+          res.writeHead(registryRes.statusCode, registryRes.headers);
+          res.end(packageInfo);
+        } else {
+          res.writeHead(404, registryRes.headers);
+          res.end();
+        }
       }
 
       return;
@@ -193,10 +192,10 @@ function startDevServer({ directory, port, openInBrowser = true }) {
       };
 
       const proxyReq = https.request(options, function (proxyRes) {
-        let body = '';
+        let body = new Stream();
 
         proxyRes.on('data', function (chunk) {
-          body += chunk;
+          body.push(chunk);
         });
 
         proxyRes.on('end', function () {
@@ -207,7 +206,7 @@ function startDevServer({ directory, port, openInBrowser = true }) {
             : { ...proxyRes.headers, 'cache-control': 'no-cache' };
 
           res.writeHead(statusCode, headers);
-          res.end(body);
+          res.end(body.read());
         });
       });
       proxyReq.end();
