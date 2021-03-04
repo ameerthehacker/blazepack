@@ -55,7 +55,6 @@
     "find-package-json": "^1.2.0",
     "get-all-files": "^3.0.0",
     "ini": "^2.0.0",
-    "latest-version": "^5.1.0",
     "match-all": "^1.2.6",
     "minimist": "^1.2.5",
     "npm-conf": "^1.1.3",

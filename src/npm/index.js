@@ -4,7 +4,6 @@ const ini = require('ini');
 const npmConf = require('npm-conf')();
 const matchAll = require('match-all');
 const request = require('../request');
-const { rejects } = require('assert');
 
 const GLOBAL_CONFIG = npmConf.get('globalconfig');
 const USER_CONFIG = npmConf.get('userconfig');
