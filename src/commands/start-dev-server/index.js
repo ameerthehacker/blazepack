@@ -21,8 +21,15 @@ const request = require('../../request');
 const matchAll = require('match-all');
 
 let sandboxFiles;
+const noop = () => null;
 
-function startDevServer({ directory, port, openInBrowser = true }) {
+function startDevServer({
+  directory,
+  port,
+  openInBrowser = true,
+  onSuccess = noop,
+  onError = noop,
+}) {
   try {
     detectTemplate(directory);
   } catch (err) {
@@ -323,6 +330,8 @@ function startDevServer({ directory, port, openInBrowser = true }) {
 
         console.log(`⚡ Blazepack dev server running at ${devServerURL}`);
         if (openInBrowser) openBrowser(`http://localhost:${port}`);
+
+        onSuccess(httpServer);
       })
       .on('all', (event, filePath) => {
         const relativePath = `/${getPosixPath(
@@ -351,6 +360,8 @@ function startDevServer({ directory, port, openInBrowser = true }) {
 
   if (process.env.NODE_ENV !== 'development') {
     process.on('uncaughtException', (err) => {
+      onError(err);
+
       if (err.errno === 'EADDRINUSE') {
         logError(
           `Unable to start blazepack dev server, port ${port} is already in use`

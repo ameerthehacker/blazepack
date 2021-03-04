@@ -8,7 +8,16 @@ const {
 const startDevServer = require('../start-dev-server');
 const path = require('path');
 
-async function createProject({ projectName, templateId, startServer, port }) {
+const noop = () => null;
+
+async function createProject({
+  projectName,
+  templateId,
+  startServer,
+  port,
+  onSuccess = noop,
+  onError = noop,
+}) {
   try {
     const projectPath = path.join(process.cwd(), projectName);
 
@@ -20,10 +29,13 @@ async function createProject({ projectName, templateId, startServer, port }) {
 
     if (startServer) {
       logInfo(`🚀 Starting project ${projectName}...`);
-      startDevServer({ directory: projectPath, port });
+      startDevServer({ directory: projectPath, port, onSuccess, onError });
+    } else {
+      onSuccess();
     }
   } catch (err) {
     logError(`Unable to create new project: ${err}`);
+    onError(err);
   }
 }
 

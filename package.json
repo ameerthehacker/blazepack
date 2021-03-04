@@ -2,7 +2,7 @@
   "name": "blazepack",
   "version": "0.0.40",
   "description": "Blazing fast dev server powered by sandpack",
-  "main": "./bin/blazepack.js",
+  "main": "./src/index.js",
   "bin": {
     "blazepack": "./bin/blazepack.js"
   },
