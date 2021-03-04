@@ -16,7 +16,7 @@ const {
   detectTemplate,
 } = require('../../utils');
 const { blue, underline } = require('chalk');
-const { getRegistries } = require('../../npm');
+const npm = require('../../npm');
 const request = require('../../request');
 const matchAll = require('match-all');
 
@@ -35,7 +35,7 @@ function startDevServer({ directory, port, openInBrowser = true }) {
   const WWW_PATH = path.join(ROOT_DIR, 'client', 'www');
   const INDEX_HTML_PATH = path.join(WWW_PATH, 'index.html');
   const isSandpackAvailableLocally = process.env.SANDPACK_LOCAL;
-  const npmRegistries = getRegistries(directory);
+  const npmRegistries = npm.getRegistries(directory);
   const assetExistsInStaticPath = (url) => {
     const assetPath = path.join(WWW_PATH, url);
 
@@ -92,7 +92,7 @@ function startDevServer({ directory, port, openInBrowser = true }) {
         .split('/');
       const [scope] = package.split('%2f');
       const registryConfig = npmRegistries.find((npmRegistry) =>
-        npmRegistry.scopes.includes(scope.substring(1))
+        npmRegistry.scopes.includes(scope)
       );
 
       // we could not find that registry in npm

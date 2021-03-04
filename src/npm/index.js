@@ -3,6 +3,8 @@ const fs = require('fs');
 const ini = require('ini');
 const npmConf = require('npm-conf')();
 const matchAll = require('match-all');
+const request = require('../request');
+const { rejects } = require('assert');
 
 const GLOBAL_CONFIG = npmConf.get('globalconfig');
 const USER_CONFIG = npmConf.get('userconfig');
@@ -37,10 +39,10 @@ function getRegistries(directory) {
       });
 
       if (registryConfig) {
-        registryConfig.scopes.push(scope);
+        registryConfig.scopes.push(`@${scope}`);
       } else {
         registries.push({
-          scopes: [scope],
+          scopes: [`@${scope}`],
           registry: npmrc[config],
         });
       }
@@ -69,6 +71,38 @@ function getRegistries(directory) {
   return registries;
 }
 
+function getLatestVersion(packageName) {
+  let npmRegistryURL = 'https://registry.npmjs.org';
+  const registries = getRegistries(process.cwd());
+  const [scope] = packageName.split('/');
+  const registryConfig = registries.find((rConfig) =>
+    rConfig.scopes.includes(scope)
+  );
+  let headers = {};
+
+  if (registryConfig && registryConfig.registry) {
+    npmRegistryURL = registryConfig.registry;
+    if (registryConfig.token) {
+      headers = {
+        Authorization: `Bearer ${registryConfig.token}`,
+      };
+    }
+  }
+
+  return new Promise((resolve, reject) => {
+    request
+      .get(`${npmRegistryURL}/${packageName}`, headers)
+      .then(({ body: packageInfo, response }) => {
+        if (response.statusCode === 200) {
+          resolve(JSON.parse(packageInfo)['dist-tags']['latest']);
+        } else {
+          reject(JSON.parse(packageInfo));
+        }
+      });
+  });
+}
+
 module.exports = {
   getRegistries,
+  getLatestVersion,
 };

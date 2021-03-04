@@ -18,7 +18,7 @@ describe('npm utils', () => {
 
     expect(registries).toEqual([
       {
-        scopes: ['myscope', 'myanotherscope'],
+        scopes: ['@myscope', '@myanotherscope'],
         registry: 'http://localhost:4873',
         token: 'token',
       },
