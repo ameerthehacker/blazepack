@@ -31,13 +31,19 @@ function exportSandbox({ directory, openInBrowser }) {
       res.on('data', (chunk) => (data += chunk));
 
       res.on('end', () => {
-        const { sandbox_id } = JSON.parse(data);
-        const sandboxURL = `https://codesandbox.io/s/${sandbox_id}`;
+        try {
+          const { sandbox_id } = JSON.parse(data);
+          const sandboxURL = `https://codesandbox.io/s/${sandbox_id}`;
 
-        logSuccess(`✅ Sanbox created and available at ${sandboxURL}`);
+          logSuccess(`✅ Sanbox created and available at ${sandboxURL}`);
 
-        if (openInBrowser) {
-          open(sandboxURL);
+          if (openInBrowser) {
+            open(sandboxURL);
+          }
+        } catch (err) {
+          logError(
+            `Failed to export the project, codesandbox responded with: ${data}`
+          );
         }
       });
     }
