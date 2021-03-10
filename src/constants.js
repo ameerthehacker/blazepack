@@ -66,4 +66,14 @@ const TEMPLATES = {
   cxjs: 'github/codaxy/cxjs-codesandbox-template/tree/master',
 };
 
-module.exports = { WS_EVENTS, MIME_TYPES, TEMPLATES };
+const IGNORED_DIRECTORIES = [/node_modules/, /.git/, /.cache/];
+
+const IGNORED_FILES = [/yarn.lock/, /package-lock.json/, /.gitignore/];
+
+module.exports = {
+  WS_EVENTS,
+  MIME_TYPES,
+  TEMPLATES,
+  IGNORED_DIRECTORIES,
+  IGNORED_FILES,
+};

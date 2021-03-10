@@ -3,7 +3,12 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const WebSocket = require('ws');
-const { WS_EVENTS, MIME_TYPES } = require('../../constants');
+const {
+  WS_EVENTS,
+  MIME_TYPES,
+  IGNORED_DIRECTORIES,
+  IGNORED_FILES,
+} = require('../../constants');
 const chokidar = require('chokidar');
 const openBrowser = require('../../open-browser');
 const Stream = require('stream').Transform;
@@ -339,7 +344,16 @@ function startDevServer({
 
   httpServer.listen(port, () => {
     chokidar
-      .watch(directory, { ignoreInitial: true })
+      .watch(directory, {
+        ignoreInitial: true,
+        ignored: (path) => {
+          return (
+            IGNORED_DIRECTORIES.find((IGNORED_DIRECTORY) =>
+              IGNORED_DIRECTORY.test(path)
+            ) || IGNORED_FILES.find((IGNORED_FILE) => IGNORED_FILE.test(path))
+          );
+        },
+      })
       .on('ready', () => {
         const devServerURL = blue(underline(`http://localhost:${port}`));
 

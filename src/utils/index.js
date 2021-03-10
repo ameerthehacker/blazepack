@@ -6,7 +6,11 @@ const fs = require('fs');
 const path = require('path');
 const Stream = require('stream').Transform;
 const getAllFiles = require('get-all-files').default;
-const { TEMPLATES } = require('../constants');
+const {
+  TEMPLATES,
+  IGNORED_DIRECTORIES,
+  IGNORED_FILES,
+} = require('../constants');
 
 function logError(message) {
   console.error(`❌ ${red(message)}`);
@@ -335,9 +339,6 @@ function readAsDataUrlSync(filePath) {
 }
 
 function readSandboxFromFS(directory, exportFormat = false) {
-  const IGNORED_DIRECTORIES = [/node_modules/, /.git/, /.cache/];
-  const IGNORED_FILES = [/yarn.lock/, /package-lock.json/, /.gitignore/];
-
   let sandboxFiles = {};
   // get all files in the dir except node modules
   const filePaths = getAllFiles.sync.array(directory, {
