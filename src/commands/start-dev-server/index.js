@@ -191,24 +191,10 @@ function startDevServer({
       return;
     }
 
-    /**
-     * Serve client/index.js for updating on websockets events.
-     */
-    if (req.url === '/index.js') {
-      const clientJSPath = path.join(ROOT_DIR, 'lib', 'index.js');
-      const assetContent = fs.readFileSync(clientJSPath, 'utf-8');
-
-      res.setHeader('Content-Type', 'text/javascript');
-      res.write(assetContent);
-      res.end();
-
-      return;
-    }
-
-    let url;
-
     const filename = path.basename(req.url);
     const ext = getExtension(filename);
+    let mimeType = MIME_TYPES[ext] || 'text/plain';
+    let url;
 
     /**
      * Serve index.html, on root url.
@@ -216,46 +202,64 @@ function startDevServer({
      */
     if (req.url === '/' || !ext) {
       url = '/index.html';
+      mimeType = 'text/html';
     } else {
       url = req.url;
     }
 
-    if (url !== '/index.html') {
-      /**
-       * This will work for svgs, or any other assets not hosted by sandpack.
-       */
-      const mimeType = MIME_TYPES[ext] || 'text/plain';
+    res.setHeader('Content-Type', mimeType);
 
-      if (!mimeType) {
-        logError(
-          "We don't support this file extension. Please create an issue to add the support for the file."
-        );
-      }
+    const blazepackCoreVersion = '0.0.2';
+    const indexHTMLContent = (
+      await request.get(
+        `https://www.unpkg.com/blazepack-core@${blazepackCoreVersion}/www/index.html`
+      )
+    ).body;
 
-      res.setHeader('Content-Type', mimeType);
+    if (url === '/index.html') {
+      res.write(indexHTMLContent);
+      res.end();
 
-      /**
-       * We first check whether the file is available in public folder first
-       */
-      const publicFilePath = path.join(directory, 'public', req.url);
+      return;
+    }
 
-      if (fs.existsSync(publicFilePath)) {
-        res.write(fs.readFileSync(publicFilePath));
-        res.end();
+    /**
+     * Serve client/index.js for updating on websockets events.
+     */
+    if (req.url === '/index.js') {
+      const clientJSPath = path.join(ROOT_DIR, 'lib', 'index.js');
+      const assetContent = fs.readFileSync(clientJSPath, 'utf-8');
 
-        return;
-      }
+      res.write(assetContent);
+      res.end();
 
-      const assetPath = path.join(directory, req.url);
+      return;
+    }
 
-      if (fs.existsSync(assetPath)) {
-        const assetContent = fs.readFileSync(assetPath);
-        res.write(assetContent);
+    /**
+     * We first check whether the file is available in public folder first
+     */
+    const publicFilePath = path.join(directory, 'public', req.url);
 
-        res.end();
+    if (fs.existsSync(publicFilePath)) {
+      res.write(fs.readFileSync(publicFilePath));
+      res.end();
 
-        return;
-      }
+      return;
+    }
+
+    /**
+     * This will work for svgs, or any other assets not hosted by sandpack.
+     */
+    const assetPath = path.join(directory, req.url);
+
+    if (fs.existsSync(assetPath)) {
+      const assetContent = fs.readFileSync(assetPath);
+      res.write(assetContent);
+
+      res.end();
+
+      return;
     }
 
     /**
@@ -265,7 +269,7 @@ function startDevServer({
      */
     const options = {
       hostname: 'www.unpkg.com',
-      path: `/blazepack-core@0.0.2/www${url}`,
+      path: `/blazepack-core@${blazepackCoreVersion}/www${url}`,
       method: req.method,
     };
 
@@ -278,13 +282,13 @@ function startDevServer({
 
       proxyRes.on('end', function () {
         const statusCode = proxyRes.statusCode;
-        const shouldCache = statusCode === 200 && url !== '/index.html';
-        const headers = shouldCache
-          ? proxyRes.headers
-          : { ...proxyRes.headers, 'cache-control': 'no-cache' };
-
-        res.writeHead(statusCode, headers);
-        res.end(body.read());
+        if (statusCode === 200) {
+          res.writeHead(statusCode, proxyRes.headers);
+          res.end(body.read());
+        } else {
+          res.write(indexHTMLContent);
+          res.end();
+        }
       });
     });
     proxyReq.end();
