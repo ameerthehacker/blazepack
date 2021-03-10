@@ -7,7 +7,7 @@
     "blazepack": "./bin/blazepack.js"
   },
   "scripts": {
-    "e2e": "jest e2e --forceExit",
+    "e2e": "jest e2e",
     "e2e:ci": "jest e2e --forceExit --runInBand",
     "test": "jest src",
     "test:watch": "jest src --watch",

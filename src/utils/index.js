@@ -162,7 +162,7 @@ function getSandboxFiles(id) {
   });
 }
 
-function downloadImage(url) {
+function downloadFile(url) {
   return new Promise((resolve, reject) => {
     https
       .get(url, (response) => {
@@ -267,10 +267,10 @@ async function createSandboxFiles(sandboxInfo, projectName) {
    * Create all files, with the code.
    */
   for (const module of sandboxInfo.modules) {
-    // if it is a image we need to download it from codesandbox locally
-    if (isImage(module.title)) {
+    // if it is a url we need to download it from codesandbox locally
+    if (/^https?:\/\/(.*)$/.test(module.code)) {
       try {
-        module.code = await downloadImage(module.code);
+        module.code = await downloadFile(module.code);
       } catch (err) {
         logError(`${module.title}: ${err}`);
       }

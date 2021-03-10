@@ -221,7 +221,10 @@ function startDevServer({
       url = req.url;
     }
 
-    if (url === '/index.html' || hostedSandboxAssetExtensions.includes(ext)) {
+    if (
+      (url === '/index.html' || hostedSandboxAssetExtensions.includes(ext)) &&
+      url !== '/manifest.json'
+    ) {
       /**
        * Proxy all requests which access sandpack assets.
        * We host our bundler with unpkg, which will cache all deps
@@ -256,7 +259,7 @@ function startDevServer({
       /**
        * This will work for svgs, or any other assets not hosted by sandpack.
        */
-      const mimeType = MIME_TYPES[ext];
+      const mimeType = MIME_TYPES[ext] || 'text/plain';
 
       if (!mimeType) {
         logError(
@@ -264,7 +267,25 @@ function startDevServer({
         );
       }
 
-      res.setHeader('Content-Type', mimeType || 'text/plain');
+      res.setHeader('Content-Type', mimeType);
+
+      /**
+       * We first check whether the file is available in public folder first
+       */
+      const isPublicFile = Object.keys(sandboxFiles).find(
+        (key) => key.toLowerCase() === `/public${req.url.toLowerCase()}`
+      );
+
+      if (isPublicFile) {
+        const publicFilePath = path.join(directory, 'public', req.url);
+
+        if (fs.existsSync(publicFilePath)) {
+          res.write(fs.readFileSync(publicFilePath));
+          res.end();
+
+          return;
+        }
+      }
 
       const assetPath = path.join(directory, req.url);
 
