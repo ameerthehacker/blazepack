@@ -206,7 +206,6 @@ function startDevServer({
     }
 
     let url;
-    const hostedSandboxAssetExtensions = ['js', 'html', 'css', 'json', 'map'];
 
     const filename = path.basename(req.url);
     const ext = getExtension(filename);
@@ -221,41 +220,7 @@ function startDevServer({
       url = req.url;
     }
 
-    if (
-      (url === '/index.html' || hostedSandboxAssetExtensions.includes(ext)) &&
-      url !== '/manifest.json'
-    ) {
-      /**
-       * Proxy all requests which access sandpack assets.
-       * We host our bundler with unpkg, which will cache all deps
-       * and bundling files.
-       */
-      const options = {
-        hostname: 'www.unpkg.com',
-        path: `/blazepack-core@0.0.2/www${url}`,
-        method: req.method,
-      };
-
-      const proxyReq = https.request(options, function (proxyRes) {
-        let body = new Stream();
-
-        proxyRes.on('data', function (chunk) {
-          body.push(chunk);
-        });
-
-        proxyRes.on('end', function () {
-          const statusCode = proxyRes.statusCode;
-          const shouldCache = statusCode === 200 && url !== '/index.html';
-          const headers = shouldCache
-            ? proxyRes.headers
-            : { ...proxyRes.headers, 'cache-control': 'no-cache' };
-
-          res.writeHead(statusCode, headers);
-          res.end(body.read());
-        });
-      });
-      proxyReq.end();
-    } else {
+    if (url !== '/index.html') {
       /**
        * This will work for svgs, or any other assets not hosted by sandpack.
        */
@@ -272,19 +237,13 @@ function startDevServer({
       /**
        * We first check whether the file is available in public folder first
        */
-      const isPublicFile = Object.keys(sandboxFiles).find(
-        (key) => key.toLowerCase() === `/public${req.url.toLowerCase()}`
-      );
+      const publicFilePath = path.join(directory, 'public', req.url);
 
-      if (isPublicFile) {
-        const publicFilePath = path.join(directory, 'public', req.url);
+      if (fs.existsSync(publicFilePath)) {
+        res.write(fs.readFileSync(publicFilePath));
+        res.end();
 
-        if (fs.existsSync(publicFilePath)) {
-          res.write(fs.readFileSync(publicFilePath));
-          res.end();
-
-          return;
-        }
+        return;
       }
 
       const assetPath = path.join(directory, req.url);
@@ -292,12 +251,43 @@ function startDevServer({
       if (fs.existsSync(assetPath)) {
         const assetContent = fs.readFileSync(assetPath);
         res.write(assetContent);
-      } else {
-        res.writeHead(404);
-      }
 
-      res.end();
+        res.end();
+
+        return;
+      }
     }
+
+    /**
+     * Proxy all requests which access sandpack assets.
+     * We host our bundler with unpkg, which will cache all deps
+     * and bundling files.
+     */
+    const options = {
+      hostname: 'www.unpkg.com',
+      path: `/blazepack-core@0.0.2/www${url}`,
+      method: req.method,
+    };
+
+    const proxyReq = https.request(options, function (proxyRes) {
+      let body = new Stream();
+
+      proxyRes.on('data', function (chunk) {
+        body.push(chunk);
+      });
+
+      proxyRes.on('end', function () {
+        const statusCode = proxyRes.statusCode;
+        const shouldCache = statusCode === 200 && url !== '/index.html';
+        const headers = shouldCache
+          ? proxyRes.headers
+          : { ...proxyRes.headers, 'cache-control': 'no-cache' };
+
+        res.writeHead(statusCode, headers);
+        res.end(body.read());
+      });
+    });
+    proxyReq.end();
   };
 
   const httpServer = http.createServer(

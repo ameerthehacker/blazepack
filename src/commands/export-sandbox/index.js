@@ -6,6 +6,7 @@ const {
 } = require('../../utils');
 const https = require('https');
 const open = require('open');
+const { underline } = require('chalk');
 
 function exportSandbox({ directory, openInBrowser }) {
   const sandboxFiles = readSandboxFromFS(directory, true);
@@ -35,7 +36,9 @@ function exportSandbox({ directory, openInBrowser }) {
           const { sandbox_id } = JSON.parse(data);
           const sandboxURL = `https://codesandbox.io/s/${sandbox_id}`;
 
-          logSuccess(`✅ Sanbox created and available at ${sandboxURL}`);
+          logSuccess(
+            `✅ Sanbox created and available at ${underline(sandboxURL)}`
+          );
 
           if (openInBrowser) {
             open(sandboxURL);
