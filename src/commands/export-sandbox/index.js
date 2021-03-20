@@ -8,7 +8,14 @@ const https = require('https');
 const open = require('open');
 const { underline } = require('chalk');
 
-function exportSandbox({ directory, openInBrowser }) {
+const noop = () => null;
+
+function exportSandbox({
+  directory,
+  openInBrowser,
+  onSuccess = noop,
+  onError = noop,
+}) {
   const sandboxFiles = readSandboxFromFS(directory, true);
   const payload = JSON.stringify({
     files: sandboxFiles,
@@ -43,8 +50,13 @@ function exportSandbox({ directory, openInBrowser }) {
           if (openInBrowser) {
             open(sandboxURL);
           }
+
+          onSuccess();
         } catch (err) {
-          logError(
+          const errMsg = `Failed to export the project, codesandbox responded with: ${data}`;
+
+          logError(errMsg);
+          onError(
             `Failed to export the project, codesandbox responded with: ${data}`
           );
         }
@@ -53,7 +65,10 @@ function exportSandbox({ directory, openInBrowser }) {
   );
 
   req.on('error', (err) => {
-    logError(`Unable to export to sandbox: ${err}`);
+    const errMsg = `Unable to export to sandbox: ${err}`;
+
+    logError(errMsg);
+    onError(errMsg);
   });
 
   req.write(payload);

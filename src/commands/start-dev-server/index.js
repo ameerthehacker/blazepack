@@ -336,6 +336,8 @@ function startDevServer({
 
           logInfo('Terminating the server');
           httpServer.close();
+
+          onError(`${title}: ${message}`);
           process.exit(1);
         }
       }
