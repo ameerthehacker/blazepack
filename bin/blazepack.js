@@ -92,6 +92,7 @@ if (args.version) {
   }
 
   switch (command) {
+    case 'i':
     case 'add':
     case 'install': {
       const package = args._[1];
