@@ -16,6 +16,12 @@ function logError(message) {
   console.error(`❌ ${red(message)}`);
 }
 
+function logVerbose(message) {
+  if (global.verbose || process.env.DEBUG) {
+    console.log(`${blue('verbose:')} ${message}`);
+  }
+}
+
 function logSuccess(message) {
   console.log(green(message));
 }
@@ -452,6 +458,7 @@ module.exports = {
   logInfo,
   logSuccess,
   logHelp,
+  logVerbose,
   getSandboxFiles,
   createSandboxFiles,
   isImage,

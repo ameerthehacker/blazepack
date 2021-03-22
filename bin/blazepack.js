@@ -26,6 +26,9 @@ const DEFAULT_PORT = 3000;
 const PORT = args.port || DEFAULT_PORT;
 const BROWSER = args.browser || '';
 
+// for verbose logging
+global.verbose = args.verbose;
+
 function validateNewProject(projectName, template) {
   if (!projectName) {
     logError(`Required argument project name was not provided`);

@@ -15,6 +15,7 @@ const Stream = require('stream').Transform;
 const {
   logError,
   logInfo,
+  logVerbose,
   getExtension,
   readSandboxFromFS,
   getPosixPath,
@@ -307,29 +308,25 @@ function startDevServer({
   wsServer.on('connection', (ws) => {
     sandboxFiles = readSandboxFromFS(directory);
 
-    ws.send(
-      JSON.stringify({
-        type: WS_EVENTS.INIT,
-        data: {
-          files: sandboxFiles,
-          registryScopes: npmRegistries.map(
-            (npmRegistry) => npmRegistry.scopes
-          ),
-        },
-      })
-    );
+    logVerbose(`client connected`);
+
+    const payload = {
+      type: WS_EVENTS.INIT,
+      data: {
+        files: sandboxFiles,
+        registryScopes: npmRegistries.map((npmRegistry) => npmRegistry.scopes),
+      },
+    };
+
+    logVerbose(`sending payload: ${JSON.stringify(payload, null, 2)}`);
+
+    ws.send(JSON.stringify(payload));
 
     ws.on('message', (evt) => {
       const { type, data } = JSON.parse(evt);
       const { title, message } = data;
 
       switch (type) {
-        case WS_EVENTS.ERROR: {
-          logError(title);
-          logError(message);
-
-          break;
-        }
         case WS_EVENTS.UNHANDLED_SANDPACK_ERROR: {
           logError(title);
           logError(message);
@@ -345,6 +342,8 @@ function startDevServer({
   });
 
   httpServer.listen(port, () => {
+    logVerbose('starting to watch fs using chokidar...');
+
     chokidar
       .watch(directory, {
         ignoreInitial: true,
@@ -368,23 +367,32 @@ function startDevServer({
         const relativePath = `/${getPosixPath(
           path.relative(directory, filePath)
         )}`;
+
+        logVerbose(
+          `fs change detected, event: ${event}, filePath: ${relativePath}`
+        );
+
         let fileContent;
 
         if (event !== 'unlink' && event !== 'unlinkDir' && event !== 'addDir') {
           fileContent = fs.readFileSync(filePath, 'utf-8');
+
+          logVerbose(`changed filecontent: ${fileContent}`);
         }
 
+        const payload = {
+          type: WS_EVENTS.PATCH,
+          data: {
+            event,
+            path: relativePath,
+            fileContent,
+          },
+        };
+
+        logVerbose(`sending payload: ${JSON.stringify(payload, null, 2)}`);
+
         wsServer.clients.forEach((client) => {
-          client.send(
-            JSON.stringify({
-              type: WS_EVENTS.PATCH,
-              data: {
-                event,
-                path: relativePath,
-                fileContent,
-              },
-            })
-          );
+          client.send(JSON.stringify(payload));
         });
       });
   });
