@@ -38,6 +38,8 @@ Install it globally
 npm i -g blazepack
 ```
 
+You can also use the [blazepack vscode extension](https://marketplace.visualstudio.com/items?itemName=ameerthehacker.blazepack-vscode)
+
 ## Usage
 
 ### Create project from Template
@@ -178,6 +180,14 @@ blazepack --help
 # get help on individual command
 
 blazepack start --help
+```
+
+### Facing issues?
+
+Run blazepack in verbose mode and share the log by raising an issue
+
+```
+blazepack start --verbose > blazepack.log
 ```
 
 ## Contributors ✨
