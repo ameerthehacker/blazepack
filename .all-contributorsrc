@@ -62,6 +62,15 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "saideepesh000",
+      "name": "Sai Deepesh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43727167?v=4",
+      "profile": "https://github.com/saideepesh000",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
