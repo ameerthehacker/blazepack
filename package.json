@@ -4,7 +4,9 @@
   "description": "Blazing fast dev server powered by sandpack",
   "main": "./src/index.js",
   "bin": {
-    "blazepack": "./bin/blazepack.js"
+    "blazepack": "./bin/blazepack.js",
+    "bpk": "./bin/blazepack.js",
+    "blaze": "./bin/blazepack.js"
   },
   "scripts": {
     "e2e": "jest e2e",
