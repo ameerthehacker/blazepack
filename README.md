@@ -170,6 +170,18 @@ We honour the project level `.npmrc` file and if it is not found we fallback to 
 //registry.myorg.com/:_authToken=secrettoken
 ```
 
+### Aliases for blazepack
+
+We create two more alias for blazepack to help you with lesser typing 😇
+
+```
+bpk create my-cra
+
+# or
+
+blaze create my-cra
+```
+
 ### Help
 
 You can know more about the available commands and their options using the help command
