@@ -73,6 +73,15 @@
         "ideas",
         "code"
       ]
+    },
+    {
+      "login": "Logan1x",
+      "name": "Khushal Sharma",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10944610?v=4",
+      "profile": "https://logan1x.github.io/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
