@@ -104,6 +104,10 @@ blazepack install redux
 
 # or
 
+blazepack i redux
+
+# or
+
 blazepack add redux
 ```
 

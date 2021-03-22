@@ -46,6 +46,7 @@ Commands:
   clone           Clone an existing codesandbox
   export          Export to codesandbox.io
   install         Install dependency
+  i               Install dependency (alias for install)
   add             Install dependency (alias for install)
   uninstall       Remove dependency
   remove          Remove dependency (alias for uninstall)
@@ -93,18 +94,20 @@ Usage: blazepack clone <sandbox-url|sandbox-id|embed-url>.
 Clone the sandbox from the given sadbox url, id or embed-url.
 `);
         break;
+      case 'i':
       case 'install':
-        console.log(`\nUsage: blazepack install <package>`);
       case 'add':
-        if (command === 'add') {
-          console.log(`\nUsage: blazepack add <package>`);
-        }
+        console.log(`\nUsage: blazepack ${command} <package>`);
         console.log(`
 Quickly Install a new package (dependency).
 It does not create node_modules so you are gonna save a lot of space.
-The install & add command are both similar.
+The install, i, add commands are all similar.
 
 eg: blazepack install redux
+
+# or
+
+blazepack i redux
 
 # or
 
@@ -112,11 +115,8 @@ blazepack add redux
 `);
         break;
       case 'uninstall':
-        console.log(`\nUsage: blazepack uninstall <package>`);
       case 'remove':
-        if (command === 'remove') {
-          console.log(`\nUsage: blazepack remove <package>`);
-        }
+        console.log(`\nUsage: blazepack ${command} <package>`);
         console.log(`
 Quickly Remove an unused package (dependency).
 The uninstall & remove command are both similar.
