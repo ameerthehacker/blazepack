@@ -315,6 +315,7 @@ function startDevServer({
       data: {
         files: sandboxFiles,
         registryScopes: npmRegistries.map((npmRegistry) => npmRegistry.scopes),
+        verbose: global.verbose,
       },
     };
 

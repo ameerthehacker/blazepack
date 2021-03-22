@@ -8,8 +8,15 @@ const info = (message) => console.log(`${name}: ${message}`);
 const ws = new WebSocket(`ws://${window.location.host}`);
 let sandboxFiles;
 let customNpmRegistries = [];
+let verbose = false;
 
 ws.onopen = () => info('connected');
+
+function logVerbose(message, ...args) {
+  if (verbose) {
+    console.log(`verbose: ${message}`, ...args);
+  }
+}
 
 function getFilename(filePath) {
   const fileParts = filePath.split('/');
@@ -48,6 +55,7 @@ ws.onmessage = (evt) => {
     switch (type) {
       case WS_EVENTS.INIT: {
         sandboxFiles = data.files;
+        verbose = data.verbose;
         customNpmRegistries = data.registryScopes.map((scopes) => ({
           enabledScopes: scopes,
           limitToScopes: true,
@@ -72,6 +80,8 @@ ws.onmessage = (evt) => {
           }
         }
 
+        logVerbose(`got ${WS_EVENTS.INIT} event with payload: `, evt.data);
+
         compile({
           modules: sandboxFiles,
           codesandbox: true,
@@ -86,6 +96,8 @@ ws.onmessage = (evt) => {
       case WS_EVENTS.PATCH: {
         const { event, fileContent, path } = data;
         const filename = getFilename(path);
+
+        logVerbose(`got ${WS_EVENTS.PATCH} event with payload: `, evt.data);
 
         // we need to reload so that sandpack can install the package
         if (filename === 'package.json') {

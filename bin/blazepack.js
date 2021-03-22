@@ -27,7 +27,7 @@ const PORT = args.port || DEFAULT_PORT;
 const BROWSER = args.browser || '';
 
 // for verbose logging
-global.verbose = args.verbose;
+global.verbose = args.verbose || process.env.DEBUG;
 
 function validateNewProject(projectName, template) {
   if (!projectName) {
