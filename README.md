@@ -205,6 +205,18 @@ Run blazepack in verbose mode and share the log by raising an issue
 ```
 blazepack start --verbose > blazepack.log
 ```
+### Contributing To This Project
+
+Fork this repository to make your own copy
+```
+git clone https://github.com/yourusername/blazepack
+cd blazepack
+npm install
+mkdir playground # Creates a git-ignored playground folder 
+cd playground
+node ../bin/blazepack.js <command> <name> <template> # Executes our local blazepack project in playground folder
+```
+Now we can make use of `node relative-path-to-bin/blazepack.js <command> <package>` in playground folder to run and execute our local blazepack project
 
 ## Contributors ✨
 
