@@ -205,6 +205,18 @@ Run blazepack in verbose mode and share the log by raising an issue
 ```
 blazepack start --verbose > blazepack.log
 ```
+### Contributing To This Project
+
+```
+Fork this repository to make your own copy
+git clone https://github.com/yourusername/blazepack
+cd blazepack
+npm install
+npm link 
+# With this, blazepack project is added to global packages, 
+# i.e we can make changes to our local blazepack project and see the changes without having to rebuild the package
+# Make any changes to the project and instantly see the changes via blazepack <command> <package>
+```
 
 ## Contributors ✨
 
