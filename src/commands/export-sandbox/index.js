@@ -50,7 +50,7 @@ function exportSandbox({
             open(sandboxURL);
           }
 
-          onSuccess();
+          onSuccess(sandbox_id);
         } catch (err) {
           const errMsg = `Failed to export the project, codesandbox responded with: ${data}`;
 

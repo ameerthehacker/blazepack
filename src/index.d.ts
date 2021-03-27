@@ -14,14 +14,14 @@ type CreateProjectOptions = {
   startServer?: boolean;
   port?: number;
   onSuccess?: () => void;
-  onError?: () => void;
+  onError?: (err: Error) => void;
 };
 
 type ExportSandboxOptions = {
   directory: string;
   openInBrowser?: boolean;
-  onSuccess?: () => void;
-  onError?: () => void;
+  onSuccess?: (sandboxId: string) => void;
+  onError?: (err: Error) => void;
 };
 
 type Blazepack = {

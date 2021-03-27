@@ -198,6 +198,50 @@ blazepack --help
 blazepack start --help
 ```
 
+### Node Interface
+
+Blazepack exposes a Node.js API which can be directly used in Node.js runtime. Blazepack vscode extension is using the same API.
+
+```javascript
+const bpk = require('blazepack');
+
+// start the dev server
+bpk.commands.startDevServer({
+  directory: process.cwd(),      // directory of your project
+  port: 3000,                   // port on which the dev server should start, by default it is 3000
+  openInBrowser: true,         // open the project in browser once the dev server starts
+  onSuccess: (server) => {},  // success callback with node http server instance when the server is ready
+  onError = (err) => {},     // error callback when something goes wrong
+});
+
+// create a new project
+bpk.commands.createProject({
+  projectName: 'my-cra',                         // name of the project
+  templateId: bpk.constants.TEMPLATES['react'], // template to use
+  startServer: true,                           // start the dev server once the project is created
+  portL 3000,                                 // port on which the dev server should start, by default it is 3000
+  onSuccess: () => {},                       // success callback when the the project is created
+  onError: (err) => {}                      // error callback when something goes wrong
+});
+
+// export a project to codesandbox.io
+bpk.commands.exportSandbox({
+  directory: process.cwd(),       // path to the project that has to be exported
+  openInBrowser: true,           // open the sandbox in browser once exported
+  onSuccess: (sandboxId) => {}, // success callback with sandboxId when the export was successful
+  onError = (err) => {},       // error callback when something goes wrong
+})
+
+// detect the template being used in a particular project
+try {
+  const template = bpk.utils.detectTemplate(process.cwd());
+
+  console.log(`${template} is being used at ${process.cwd()}`);
+} catch {
+  console.log('Unknown project template');
+}
+```
+
 ### Facing issues?
 
 Run blazepack in verbose mode and share the log by raising an issue
