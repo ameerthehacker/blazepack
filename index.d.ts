@@ -22,20 +22,6 @@ type ExportSandboxOptions = {
   onError?: (err: Error) => void;
 };
 
-declare interface Blazepack {
-  commands: {
-    startDevServer: (options: StartDevServerOptions) => void;
-    createProject: (options: CreateProjectOptions) => void;
-    exportSandbox: (options: ExportSandboxOptions) => void;
-  };
-  utils: {
-    detectTemplate: (directory: string) => string;
-  };
-  constants: {
-    TEMPLATES: Record<string, string>;
-  };
-}
-
 declare module 'blazepack' {
   namespace commands {
     function startDevServer(options: StartDevServerOptions): void;
