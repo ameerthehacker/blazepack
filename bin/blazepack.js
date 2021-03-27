@@ -10,7 +10,7 @@ const startDevServer = require('../src/commands/start-dev-server');
 const cloneSandbox = require('../src/commands/clone-sandbox');
 const removePackage = require('../src/commands/remove-package');
 const exportSandbox = require('../src/commands/export-sandbox');
-const { TEMPLATES } = require('../src/constants');
+const { TEMPLATES, DEFAULT_PORT } = require('../src/constants');
 const pkg = require('../package.json');
 const { logError, logInfo, logHelp, getProjectRoot } = require('../src/utils');
 
@@ -22,7 +22,6 @@ notifier.notify({ isGlobal: true });
 const args = parseArgs(process.argv.slice(2));
 const command = args._[0];
 const directory = args._[1] || process.cwd();
-const DEFAULT_PORT = 3000;
 const PORT = args.port || DEFAULT_PORT;
 const BROWSER = args.browser || '';
 

@@ -7,14 +7,13 @@ const {
 const https = require('https');
 const open = require('open');
 const { underline } = require('chalk');
-
-const noop = () => null;
+const { NOOP } = require('../../constants');
 
 function exportSandbox({
   directory,
-  openInBrowser,
-  onSuccess = noop,
-  onError = noop,
+  openInBrowser = false,
+  onSuccess = NOOP,
+  onError = NOOP,
 }) {
   const sandboxFiles = readSandboxFromFS(directory, true);
   const payload = JSON.stringify({

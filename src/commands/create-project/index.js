@@ -7,16 +7,15 @@ const {
 } = require('../../utils');
 const startDevServer = require('../start-dev-server');
 const path = require('path');
-
-const noop = () => null;
+const { DEFAULT_PORT, NOOP } = require('../../constants');
 
 async function createProject({
   projectName,
   templateId,
-  startServer,
-  port,
-  onSuccess = noop,
-  onError = noop,
+  startServer = false,
+  port = DEFAULT_PORT,
+  onSuccess = NOOP,
+  onError = NOOP,
 }) {
   try {
     const projectPath = path.join(process.cwd(), projectName);

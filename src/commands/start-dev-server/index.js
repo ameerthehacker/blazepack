@@ -8,6 +8,8 @@ const {
   MIME_TYPES,
   IGNORED_DIRECTORIES,
   IGNORED_FILES,
+  NOOP,
+  DEFAULT_PORT,
 } = require('../../constants');
 const chokidar = require('chokidar');
 const openBrowser = require('../../open-browser');
@@ -27,14 +29,13 @@ const request = require('../../request');
 const matchAll = require('match-all');
 
 let sandboxFiles;
-const noop = () => null;
 
 function startDevServer({
   directory,
-  port,
+  port = DEFAULT_PORT,
   openInBrowser = true,
-  onSuccess = noop,
-  onError = noop,
+  onSuccess = NOOP,
+  onError = NOOP,
 }) {
   try {
     detectTemplate(directory);

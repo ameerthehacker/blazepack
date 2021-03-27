@@ -70,10 +70,16 @@ const IGNORED_DIRECTORIES = [/node_modules/, /.git/, /.cache/];
 
 const IGNORED_FILES = [/yarn.lock/, /package-lock.json/, /.gitignore/];
 
+const DEFAULT_PORT = 3000;
+
+const NOOP = () => null;
+
 module.exports = {
   WS_EVENTS,
   MIME_TYPES,
   TEMPLATES,
   IGNORED_DIRECTORIES,
   IGNORED_FILES,
+  DEFAULT_PORT,
+  NOOP,
 };
