@@ -36,16 +36,18 @@ declare interface Blazepack {
   };
 }
 
-declare namespace commands {
-  function startDevServer(options: StartDevServerOptions): void;
-  function createProject(options: CreateProjectOptions): void;
-  function exportSandbox(options: ExportSandboxOptions): void;
-}
+declare module 'blazepack' {
+  namespace commands {
+    function startDevServer(options: StartDevServerOptions): void;
+    function createProject(options: CreateProjectOptions): void;
+    function exportSandbox(options: ExportSandboxOptions): void;
+  }
 
-declare namespace utils {
-  function detectTemplate(directory: string): string;
-}
+  namespace utils {
+    function detectTemplate(directory: string): string;
+  }
 
-declare namespace constants {
-  var TEMPLATES: Record<string, string>;
+  namespace constants {
+    var TEMPLATES: Record<string, string>;
+  }
 }
