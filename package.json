@@ -1,6 +1,6 @@
 {
   "name": "blazepack",
-  "version": "0.0.51",
+  "version": "0.0.52",
   "description": "Blazing fast dev server powered by sandpack",
   "main": "./src/index.js",
   "bin": {
