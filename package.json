@@ -56,7 +56,7 @@
     "cli-select": "^1.1.2",
     "detect-indent": "^6.0.0",
     "find-package-json": "^1.2.0",
-    "get-all-files": "^3.0.0",
+    "glob": "^7.1.6",
     "ini": "^2.0.0",
     "match-all": "^1.2.6",
     "minimist": "^1.2.5",

@@ -5,7 +5,7 @@ const detectIndent = require('detect-indent');
 const fs = require('fs');
 const path = require('path');
 const Stream = require('stream').Transform;
-const getAllFiles = require('get-all-files').default;
+const glob = require('glob');
 const {
   TEMPLATES,
   IGNORED_DIRECTORIES,
@@ -16,9 +16,9 @@ function logError(message) {
   console.error(`❌ ${red(message)}`);
 }
 
-function logVerbose(message) {
+function logVerbose(message, ...rest) {
   if (global.verbose || process.env.DEBUG) {
-    console.log(`${blue('verbose:')} ${message}`);
+    console.log(`${blue('verbose:')} ${message}`, ...rest);
   }
 }
 
@@ -346,12 +346,21 @@ function readAsDataUrlSync(filePath) {
 
 function readSandboxFromFS(directory, exportFormat = false) {
   let sandboxFiles = {};
-  // get all files in the dir except node modules
-  const filePaths = getAllFiles.sync.array(directory, {
-    resolve: true,
-    isExcludedDir: (dirname) =>
-      IGNORED_DIRECTORIES.find((excludedDir) => excludedDir.test(dirname)),
+  const ignoredDirGlob = IGNORED_DIRECTORIES.map(
+    (IGNORED_DIRECTORY) => `**/${IGNORED_DIRECTORY.source}/**`
+  );
+  const ignoredFileGlob = IGNORED_FILES.map(
+    (IGNORED_FILE) => `**/${IGNORED_FILE.source}`
+  );
+
+  // get all files in the dir except ignored directories and files
+  const filePaths = glob.sync(`${directory}/**`, {
+    absolute: true,
+    ignore: [...ignoredDirGlob, ...ignoredFileGlob],
+    nodir: true,
   });
+
+  logVerbose('glob found files:', filePaths);
 
   filePaths.forEach((filePath) => {
     // we don't want to read unnecessary huge files

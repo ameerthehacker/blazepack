@@ -1,5 +1,5 @@
 {
   "preset": "jest-puppeteer",
   "testTimeout": 30000,
-  "testPathIgnorePatterns": ["<rootDir>/playground"]
+  "testPathIgnorePatterns": ["<rootDir>/playground", "<rootDir>/e2e/fixtures"]
 }
