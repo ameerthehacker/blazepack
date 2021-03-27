@@ -363,14 +363,7 @@ function readSandboxFromFS(directory, exportFormat = false) {
   logVerbose('glob found files:', filePaths);
 
   filePaths.forEach((filePath) => {
-    // we don't want to read unnecessary huge files
-    const isExcludedFile = IGNORED_FILES.find((excludedFile) =>
-      excludedFile.test(filePath)
-    );
     const filename = path.basename(filePath);
-
-    if (isExcludedFile) return;
-
     const relativePath = getPosixPath(path.relative(directory, filePath));
     let fileContent;
 
