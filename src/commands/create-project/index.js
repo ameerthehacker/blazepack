@@ -22,7 +22,7 @@ async function createProject({
 
     logInfo(`📥 Downloading template...`);
     const res = await getSandboxFiles(templateId);
-    logInfo('📁 Creating files & directories');
+    logInfo(`📁 Creating a new app in ${projectPath}`);
     await createSandboxFiles(res.data, projectName);
     logSuccess('✅ Project created');
 
@@ -30,6 +30,7 @@ async function createProject({
       logInfo(`🚀 Starting project ${projectName}...`);
       startDevServer({ directory: projectPath, port, onSuccess, onError });
     } else {
+      logInfo(`🎉 cd ${projectName} && blazepack start`);
       onSuccess();
     }
   } catch (err) {

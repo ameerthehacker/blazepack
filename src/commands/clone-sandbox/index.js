@@ -13,6 +13,7 @@ async function cloneSandbox({ id }) {
     logInfo('📁 Creating files & directories');
     await createSandboxFiles(res.data);
     logSuccess('✅ Sandbox cloned');
+    logInfo(`🎉 cd ${res.data.title} && blazepack start`);
   } catch (e) {
     logError(`Unable to clone sandbox: ${e}`);
   }
