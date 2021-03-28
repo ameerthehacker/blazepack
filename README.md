@@ -283,7 +283,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://logan1x.github.io/"><img src="https://avatars.githubusercontent.com/u/10944610?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Khushal Sharma</b></sub></a><br /><a href="https://github.com/ameerthehacker/blazepack/issues?q=author%3ALogan1x" title="Bug reports">🐛</a></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://github.com/SBhanushali"><img src="https://avatars.githubusercontent.com/u/29128433?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Shivam Bhanushali</b></sub></a><br /><a href="#ideas-SBhanushali" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/SBhanushali"><img src="https://avatars.githubusercontent.com/u/29128433?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Shivam Bhanushali</b></sub></a><br /><a href="#ideas-SBhanushali" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/ameerthehacker/blazepack/commits?author=SBhanushali" title="Code">💻</a></td>
   </tr>
 </table>
 
