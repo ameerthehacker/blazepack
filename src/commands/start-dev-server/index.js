@@ -399,7 +399,7 @@ function startDevServer({
       });
   });
 
-  if (process.env.NODE_ENV !== 'development') {
+  if (process.env.NODE_ENV !== 'test') {
     process.on('uncaughtException', (err) => {
       onError(err);
 
