@@ -171,7 +171,7 @@ if (args.version) {
          */
         if (
           potentialSandboxIdentifier.includes('.csb.') &&
-          !/^http?:\/\/./.test(potentialSandboxIdentifier)
+          !/^https?:\/\/./.test(potentialSandboxIdentifier)
         )
           potentialSandboxIdentifier = `https://${potentialSandboxIdentifier}`;
 
