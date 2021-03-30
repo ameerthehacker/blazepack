@@ -155,7 +155,7 @@ if (args.version) {
       break;
     }
     case 'clone': {
-      const potentialSandboxIdentifier = args._[1];
+      let potentialSandboxIdentifier = args._[1];
 
       if (!potentialSandboxIdentifier) {
         logError(`Required argument; sandbox id or url was not provided`);
@@ -167,10 +167,21 @@ if (args.version) {
       try {
         /**
          * Sample URLs for Sandbox:
-         * https://codesandbox.io/s/unique_id or https://codesandbox.io/embed/unique_id
+         * https://codesandbox.io/s/unique_id or https://codesandbox.io/embed/unique_id or https://8mcbi.csb.app or 8mcbi.csb.app
          */
+        if (
+          potentialSandboxIdentifier.includes('.csb.') &&
+          !/^http?:\/\/./.test(potentialSandboxIdentifier)
+        )
+          potentialSandboxIdentifier = `https://${potentialSandboxIdentifier}`;
+
         const url = new URL(potentialSandboxIdentifier);
-        const potentialSandboxId = url.pathname.split('/')[2];
+        let [potentialSandboxId, secondLevelDomain] = url.hostname.split('.');
+        // if csb is the second level domain then it is a preview url
+        potentialSandboxId =
+          secondLevelDomain === 'csb'
+            ? potentialSandboxId
+            : url.pathname.split('/')[2];
         if (potentialSandboxId) {
           sandboxId = potentialSandboxId;
         } else {
