@@ -95,6 +95,7 @@ if (args.version) {
     case 'add':
     case 'install': {
       const package = args._[1];
+      const dev = args.D
 
       if (!package) {
         logError(`Required argument package name was not provided`);
@@ -102,7 +103,7 @@ if (args.version) {
         process.exit(1);
       }
 
-      installPackage(package);
+      installPackage(package, dev);
       break;
     }
     case 'uninstall':
