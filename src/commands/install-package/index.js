@@ -2,7 +2,7 @@ const npm = require('../../npm');
 const fs = require('fs');
 const { logError, logSuccess, getPackageJSON } = require('../../utils');
 
-async function installPackage(package) {
+async function installPackage(package, dev) {
   try {
     let packageName, version;
 
@@ -22,17 +22,25 @@ async function installPackage(package) {
       const { json: packageJSON, indent, file } = potentialJSON;
       const latestVersion = await npm.getLatestVersion(packageName);
       const packageVersion = version || latestVersion;
-
+      if(dev == undefined){
       if (packageJSON.dependencies) {
         packageJSON.dependencies = {
           ...packageJSON.dependencies,
           [packageName]: `^${packageVersion}`,
         };
       }
+    }else{
+      if (packageJSON.devDependencies) {
+        packageJSON.devDependencies = {
+          ...packageJSON.devDependencies,
+          [packageName]: `^${packageVersion}`,
+        };
+      }
+    }
 
       fs.writeFileSync(file, JSON.stringify(packageJSON, null, indent));
 
-      logSuccess(`Installed package ${packageName}@${packageVersion}`);
+      logSuccess(`Installed ${dev ? 'dev package' : 'package'} ${packageName}@${packageVersion}`);
     } else {
       logError('Unable to find package.json for the project');
     }
