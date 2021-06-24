@@ -103,15 +103,15 @@ Quickly Install a new package (dependency).
 It does not create node_modules so you are gonna save a lot of space.
 The install, i, add commands are all similar.
 
-eg: blazepack install redux
+eg: blazepack install redux [--dev|-save-dev|-D]
 
 # or
 
-blazepack i redux
+blazepack i redux [--dev|-save-dev|-D]
 
 # or
 
-blazepack add redux
+blazepack add redux [--dev|-save-dev|-D]
 `);
         break;
       case 'uninstall':

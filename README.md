@@ -100,15 +100,15 @@ npx blazepack start
 You can install a new package pretty fast using the below command. It does not create **node_modules** so you are gonna save a lot of space 😉
 
 ```
-blazepack install redux
+blazepack install redux [--dev|-save-dev|-D]
 
 # or
 
-blazepack i redux
+blazepack i redux [--dev|-save-dev|-D]
 
 # or
 
-blazepack add redux
+blazepack add redux [--dev|-save-dev|-D]
 ```
 
 ### Remove dependency

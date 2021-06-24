@@ -95,7 +95,7 @@ if (args.version) {
     case 'add':
     case 'install': {
       const package = args._[1];
-      const dev = args.D
+      const dev = args.D || args.dev || args['save-dev'];
 
       if (!package) {
         logError(`Required argument package name was not provided`);
